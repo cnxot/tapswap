@@ -3,1156 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>TapSwap UltraBoost</title>
-    <!-- Telegram WebApp JS -->
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <title>Xot_swap</title>
     <style>
-        /* --- Enhanced "Claude Sonnet 3.7" Aesthetic --- */
         :root {
-            /* Fallback Theme Variables (if Telegram vars aren't available) */
-            --fallback-bg-color: #f0f2f5; /* Slightly more neutral */
-            --fallback-text-color: #0b0f19; /* Darker, more contrast */
-            --fallback-hint-color: #58667e; /* Muted blue-gray */
-            --fallback-link-color: #007bff;
-            --fallback-button-color: #007bff;
-            --fallback-button-text-color: #ffffff;
-            --fallback-secondary-bg-color: #ffffff;
-
-            --primary-color: var(--tg-theme-button-color, var(--fallback-button-color));
-            --secondary-color: var(--tg-theme-hint-color, var(--fallback-hint-color));
-            --background-color: var(--tg-theme-bg-color, var(--fallback-bg-color));
-            --text-color: var(--tg-theme-text-color, var(--fallback-text-color));
-            --card-bg: var(--tg-theme-secondary-bg-color, var(--fallback-secondary-bg-color));
-            --border-color: var(--tg-theme-secondary-bg-color, #e1e4e8);
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --info-color: #17a2b8;
-            --energy-color: var(--warning-color);
-            --energy-bg: #e9ecef;
-            --bottom-nav-bg: var(--tg-theme-secondary-bg-color, #ffffff);
-            --bottom-nav-border: rgba(60, 60, 67, 0.12);
-            --bottom-nav-icon-color: var(--tg-theme-hint-color, #8690a0);
-            --bottom-nav-icon-active-color: var(--tg-theme-button-color, var(--fallback-link-color));
-
-            --shadow-color-light: rgba(0, 0, 0, 0.05);
-            --shadow-color-medium: rgba(0, 0, 0, 0.08);
-            --shadow-color-strong: rgba(0, 0, 0, 0.12);
-
-            --league-bronze: #cd7f32;
-            --league-silver: #c0c0c0;
-            --league-gold: #ffd700;
-            --league-platinum: #e5e4e2;
-            --league-diamond: #b9f2ff;
+            --primary-color: #28a745; /* Greenish */
+            --secondary-color: #17a2b8; /* Bluish */
+            --background-color: #f4f4f9; /* Light grey */
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --nav-background: #ffffff;
+            --nav-text-color: #555555;
+            --nav-active-color: var(--primary-color);
+            --button-color: var(--primary-color);
+            --button-text-color: #ffffff;
+            --energy-bar-background: #e9ecef;
+            --energy-bar-fill: #ffc107; /* Yellow for energy */
+            --points-color: var(--primary-color);
+            --header-height: 50px;
+            --nav-height: 60px;
         }
 
-        /* Basic Reset */
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html { scroll-behavior: smooth; }
-        html, body {
-            height: 100%; width: 100%;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-            overscroll-behavior-y: none;
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
-            font-size: 16px; line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden; /* Prevent body scroll, pages will scroll if needed */
         }
 
-        body.dark {
-            --fallback-bg-color: #0a0c10;
-            --fallback-text-color: #e1e4e8;
-            --fallback-hint-color: #768095;
-            --fallback-link-color: #0b84fe;
-            --fallback-button-color: #0b84fe;
-            --fallback-secondary-bg-color: #161b22;
-
-            --border-color: #30363d;
-            --energy-bg: #2c323a;
-            --bottom-nav-bg: #161b22;
-            --bottom-nav-border: rgba(84, 84, 88, 0.5);
-            --shadow-color-light: rgba(0, 0, 0, 0.2);
-            --shadow-color-medium: rgba(0, 0, 0, 0.35);
-            --shadow-color-strong: rgba(0,0,0,0.5);
+        #app-header {
+            background-color: var(--primary-color);
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            font-size: 1.2em;
+            font-weight: bold;
+            height: var(--header-height);
+            line-height: calc(var(--header-height) - 30px); /* vertical align text */
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
         }
 
-        #app { display: flex; flex-direction: column; height: 100vh; width: 100%; overflow: hidden; }
-        #content { flex-grow: 1; overflow-y: auto; padding: 20px; padding-bottom: 90px; -webkit-overflow-scrolling: touch; }
+        .content-area {
+            flex-grow: 1;
+            padding-top: var(--header-height); /* Space for fixed header */
+            padding-bottom: var(--nav-height); /* Space for fixed nav */
+            overflow-y: auto; /* Allow scrolling within content area */
+        }
 
-        .page { display: none; flex-direction: column; align-items: center; width: 100%; animation: fadeIn 0.3s ease-out; }
-        .page.active { display: flex; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .page {
+            display: none;
+            padding: 20px;
+            min-height: calc(100vh - var(--header-height) - var(--nav-height) - 40px); /* Full viewport minus headers/padding */
+        }
+
+        .page.active {
+            display: block;
+        }
 
         /* Bottom Navigation */
-        #bottomNav {
-            position: fixed; bottom: 0; left: 0; right: 0; height: 75px;
-            background-color: var(--bottom-nav-bg);
-            border-top: 1px solid var(--bottom-nav-border);
-            display: flex; justify-content: space-around; align-items: stretch;
-            padding: 5px 0 12px 0; box-shadow: 0 -3px 12px var(--shadow-color-light); z-index: 1000;
+        #bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: var(--nav-height);
+            background-color: var(--nav-background);
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            border-top: 1px solid #ddd;
+            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
         }
-        .nav-button {
-            background: none; border: none; color: var(--bottom-nav-icon-color); cursor: pointer;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            font-size: 11px; font-weight: 500; flex-grow: 1; padding: 8px 0;
-            transition: color 0.2s ease, transform 0.1s ease;
-        }
-        .nav-button svg { width: 28px; height: 28px; margin-bottom: 4px; fill: currentColor; transition: transform 0.2s ease; }
-        .nav-button.active { color: var(--bottom-nav-icon-active-color); }
-        .nav-button:active { transform: scale(0.94); }
 
-        /* Shared Card Style */
-        .card {
-            background-color: var(--card-bg); border-radius: 16px;
-            padding: 20px; margin-bottom: 20px; width: 100%; max-width: 600px;
-            box-shadow: 0 6px 18px var(--shadow-color-medium);
-            border: 1px solid var(--border-color); overflow: hidden;
+        .nav-btn {
+            background: none;
+            border: none;
+            color: var(--nav-text-color);
+            font-size: 10px; /* Smaller text for icons + text */
+            cursor: pointer;
+            padding: 5px;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
         }
-        .card h2 {
-            margin-bottom: 18px; font-size: 1.5em; font-weight: 600; color: var(--text-color); text-align: center;
+        
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+            margin-bottom: 4px;
         }
-        .card .section-title { font-size: 1.1em; font-weight: 600; margin-top: 20px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--border-color); }
 
-        /* Profile Page */
-        #profilePage .profile-header { display: flex; align-items: center; margin-bottom: 25px; }
-        #profilePage .profile-pic {
-            width: 80px; height: 80px; border-radius: 50%; margin-right: 20px;
-            background-color: var(--border-color); border: 3px solid var(--card-bg);
-            box-shadow: 0 3px 8px var(--shadow-color-light); object-fit: cover;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23e0e0e0"/><path d="M50 42c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16-7.2-16-16-16zm0 28c-6.6 0-12-5.4-12-12s5.4-12 12-12 12 5.4 12 12-5.4 12-12 12z" fill="%23a0a0a0"/><path d="M76 64c0-11-8.5-20-19.3-21.7 1.1-1.6 1.8-3.5 1.8-5.6 0-5.5-4.5-10-10-10s-10 4.5-10 10c0 2.1.6 4 1.8 5.6C28.5 44 20 53 20 64v6h60v-6z" fill="%23a0a0a0"/></svg>');
-            background-size: cover; background-position: center;
+        .nav-btn.active {
+            color: var(--nav-active-color);
+            font-weight: bold;
         }
-        #profilePage .profile-name-id { flex-grow: 1; }
-        #profilePage #profileNameBig { font-size: 1.4em; font-weight: 600; margin-bottom: 2px;}
-        #profilePage #profileUserIdSmall { font-size: 0.9em; color: var(--secondary-color); }
-        #profilePage .league-badge {
-            font-size: 0.9em; font-weight: 500; padding: 6px 12px; border-radius: 20px;
-            margin-top: 8px; display: inline-block; color: #fff;
+        
+        .nav-btn.active svg path {
+            fill: var(--nav-active-color);
         }
-        #profilePage .info-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 14px 0; border-bottom: 1px solid var(--border-color); font-size: 1em;
-        }
-        #profilePage .info-item:last-child { border-bottom: none; }
-        #profilePage .info-item span:first-child { color: var(--secondary-color); margin-right: 15px; flex-shrink: 0; }
-        #profilePage .info-item span:last-child { font-weight: 500; text-align: right; word-break: break-all; color: var(--text-color); }
-        #profilePage .daily-reward-button {
-            display: block; width: 100%; padding: 12px; margin-top: 15px;
-            background-color: var(--success-color); color: white; border: none; border-radius: 10px;
-            font-size: 1em; font-weight: 500; cursor: pointer; transition: background-color 0.2s;
-        }
-        #profilePage .daily-reward-button:disabled { background-color: var(--secondary-color); cursor: not-allowed; opacity: 0.7;}
-
 
         /* Tap Page */
-        #tapPage { justify-content: space-between; height: 100%; text-align: center; padding-top: 3vh; display: flex; flex-direction: column;}
-        .tap-header-info { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 450px; margin: 0 auto 15px auto; padding: 0 10px;}
-        .tap-header-info span { font-size: 0.95em; color: var(--secondary-color); }
-        .tap-header-info strong { font-weight: 600; color: var(--text-color); }
-
-        .tap-area { display: flex; flex-direction: column; align-items: center; justify-content: center; flex-grow: 1; margin-bottom: 15px; }
-        #catButton {
-            background: none; border: none; cursor: pointer; padding: 0;
-            transition: transform 0.1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            user-select: none; -webkit-user-select: none; margin-bottom: 20px;
-        }
-        #catImage {
-            width: clamp(180px, 40vw, 220px); height: clamp(180px, 40vw, 220px);
-            border-radius: 50%;
-            background: radial-gradient(circle, var(--warning-color) 55%, color-mix(in srgb, var(--warning-color) 75%, black));
-            display: flex; align-items: center; justify-content: center; font-size: 50px;
-            box-shadow: 0 10px 30px color-mix(in srgb, var(--warning-color) 35%, transparent);
-            border: 6px solid var(--background-color);
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><text y=".9em" font-size="90">🪙</text></svg>'); /* Coin Emoji */
-            background-size: 70%; background-repeat: no-repeat; background-position: center;
-            transition: transform 0.1s ease-out;
-        }
-        #catButton:active #catImage { transform: scale(0.92); }
-        .score-display {
-            font-size: 2.8em; font-weight: 700; margin-bottom: 10px; color: var(--text-color);
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
-        .score-icon {
-            display: inline-block; width: 32px; height: 32px; vertical-align: middle;
-            background-color: var(--primary-color); border-radius: 50%;
-            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23ffffff"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm-1-7H9v2h2v2h2v-2h2V9h-2V7h-2v2z"/></svg>'); /* More generic token */
-            background-size: 60%; background-repeat: no-repeat; background-position: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.15);
-        }
-        .energy-section { width: 100%; max-width: 450px; margin: 0 auto; padding: 0 10px; }
-        .energy-label {
-            font-size: 1em; color: var(--secondary-color); margin-bottom: 8px;
-            display: flex; justify-content: space-between; align-items: center; padding: 0 5px;
-        }
-        .energy-label span:last-child { font-weight: 600; color: var(--text-color); }
-        .energy-bar-container {
-            width: 100%; height: 18px; background-color: var(--energy-bg);
-            border-radius: 9px; overflow: hidden; margin-bottom: 15px;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.08);
-        }
-        #energyBar {
-            height: 100%; width: 100%;
-            background: linear-gradient(90deg, color-mix(in srgb, var(--energy-color) 85%, #fff) 0%, var(--energy-color) 100%);
-            border-radius: 9px; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        #page-tap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
         }
 
-        /* Boosts Page */
-        #boostsPage .boost-item {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 15px; margin-bottom: 12px;
-            background-color: color-mix(in srgb, var(--card-bg) 95%, var(--background-color)); /* Slightly different shade for items */
-            border: 1px solid var(--border-color); border-radius: 12px;
-            transition: transform 0.15s ease;
-        }
-        #boostsPage .boost-item:hover { transform: translateY(-2px); box-shadow: 0 4px 10px var(--shadow-color-light); }
-        #boostsPage .boost-icon {
-            width: 48px; height: 48px; margin-right: 15px; flex-shrink: 0;
-            background-color: color-mix(in srgb, var(--primary-color) 15%, transparent);
-            border-radius: 10px; display: flex; align-items: center; justify-content: center;
-        }
-        #boostsPage .boost-icon svg { width: 28px; height: 28px; fill: var(--primary-color); }
-        #boostsPage .boost-info { flex-grow: 1; }
-        #boostsPage .boost-title { font-weight: 600; font-size: 1.1em; margin-bottom: 3px; }
-        #boostsPage .boost-description { font-size: 0.9em; color: var(--secondary-color); margin-bottom: 5px; }
-        #boostsPage .boost-level, #boostsPage .boost-cost { font-size: 0.85em; color: var(--text-color); font-weight: 500; }
-        #boostsPage .boost-cost { color: var(--primary-color); }
-        #boostsPage .boost-button {
-            padding: 10px 20px; font-size: 0.95em; font-weight: 500;
-            background-color: var(--primary-color); color: var(--fallback-button-text-color);
-            border: none; border-radius: 8px; cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease; flex-shrink: 0;
-        }
-        #boostsPage .boost-button:hover:not(:disabled) { background-color: color-mix(in srgb, var(--primary-color) 85%, black); }
-        #boostsPage .boost-button:active:not(:disabled) { transform: scale(0.96); }
-        #boostsPage .boost-button:disabled {
-            background-color: var(--secondary-color); opacity: 0.6; cursor: not-allowed;
-        }
-        #boostsPage .boost-button.maxed { background-color: var(--success-color); }
-
-        /* Task Page (mostly unchanged, minor tweaks if needed) */
-        #taskPage ul { list-style: none; width: 100%; max-width: 600px; padding: 0; }
-        #taskPage li {
-            background-color: var(--card-bg); border: 1px solid var(--border-color);
-            border-radius: 12px; padding: 15px 20px; margin-bottom: 12px;
-            display: flex; justify-content: space-between; align-items: center;
-            transition: transform 0.15s ease, box-shadow 0.15s ease;
-        }
-        #taskPage li:hover { transform: translateY(-2px); box-shadow: 0 4px 10px var(--shadow-color-light); }
-        #taskPage .task-info { flex-grow: 1; margin-right: 15px; }
-        #taskPage .task-title { font-weight: 500; margin-bottom: 4px; color: var(--text-color); }
-        #taskPage .task-reward { font-size: 0.9em; color: var(--secondary-color); display: flex; align-items: center; gap: 4px; }
-        #taskPage .task-reward svg { width: 16px; height: 16px; fill: var(--warning-color); flex-shrink: 0; }
-        #taskPage .task-button { /* Style inherited and slightly adjusted */ }
-        #taskPage .task-icon { /* Style inherited */ }
-
-        /* Withdraw Page (mostly unchanged, minor tweaks if needed) */
-        #withdrawPage .card { width: 100%; max-width: 600px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-size: 0.9em; font-weight: 500; color: var(--secondary-color); }
-        .form-group input, .form-group select {
-            width: 100%; padding: 14px 16px; border: 1px solid var(--border-color);
-            border-radius: 10px; font-size: 1em; background-color: var(--background-color);
-            color: var(--text-color); transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .form-group input:focus, .form-group select:focus {
-            outline: none; border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary-color) 20%, transparent);
-        }
-        .form-group select {
-            appearance: none; -webkit-appearance: none; -moz-appearance: none;
-            background-image: url('data:image/svg+xml;utf8,<svg fill="currentColor" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/></svg>');
-            background-repeat: no-repeat; background-position: right 16px center;
-            background-size: 1em; padding-right: 40px;
-        }
-        .withdraw-button { /* Style inherited */ }
-        .withdraw-message { /* Style inherited */ }
-
-        /* Tap Feedback Animation */
-        .tap-feedback {
-            position: absolute; font-size: 2em; font-weight: bold; color: var(--text-color);
-            opacity: 1; animation: floatUp 0.7s ease-out forwards;
-            pointer-events: none; user-select: none; white-space: nowrap;
-            text-shadow: 0 2px 4px var(--shadow-color-medium); z-index: 999;
-        }
-        @keyframes floatUp {
-            to { transform: translateY(-80px) scale(0.6); opacity: 0; }
+        #points-display {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--points-color);
+            margin-bottom: 20px;
         }
 
-        /* Loading State */
-        #loadingOverlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: color-mix(in srgb, var(--background-color) 80%, transparent);
-            display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
-            font-size: 1.2em; color: var(--text-color); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);
+        #tap-button {
+            width: 200px; /* Adjust size as needed */
+            height: 200px; /* Adjust size as needed */
+            cursor: pointer;
+            border-radius: 50%; /* Make it round if you want a circular tap area */
+            /* background-color: #ddd; Remove if image fills it */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            user-select: none; /* Prevent text selection on rapid taps */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            transition: transform 0.05s ease-out; /* Tap feedback */
         }
-        #loadingOverlay .spinner {
-            width: 40px; height: 40px; border: 4px solid color-mix(in srgb, var(--text-color) 30%, transparent);
-            border-top-color: var(--primary-color); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;
+        #tap-button:active {
+            transform: scale(0.95);
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
-        body.dark #loadingOverlay { background-color: rgba(0, 0, 0, 0.75); }
 
-        /* Shake animation for energy bar */
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
-        .energy-section.shake { animation: shake 0.3s ease-in-out; }
+        #tap-image { /* This is the cat/hamster image */
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Ensures image fits well */
+        }
 
-        /* Toast Notification */
-        #toastNotification {
-            position: fixed;
-            bottom: 90px; /* Above nav bar */
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: color-mix(in srgb, var(--text-color) 85%, var(--background-color));
-            color: var(--background-color);
-            padding: 12px 20px;
+        #energy-container {
+            width: 80%;
+            max-width: 300px;
+            text-align: center;
+        }
+
+        #energy-bar-bg {
+            background-color: var(--energy-bar-background);
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        #energy-bar-fill {
+            background-color: var(--energy-bar-fill);
+            width: 100%; /* Controlled by JS */
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.2s ease-in-out;
+        }
+        
+        #energy-text {
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        /* Profile Page */
+        #page-profile .profile-item {
+            background-color: var(--card-background);
+            padding: 15px;
+            margin-bottom: 10px;
             border-radius: 8px;
-            box-shadow: 0 4px 12px var(--shadow-color-strong);
-            z-index: 10000;
-            font-size: 0.95em;
-            opacity: 0;
-            transition: opacity 0.3s ease, bottom 0.3s ease;
-            pointer-events: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
-        #toastNotification.show { opacity: 1; bottom: 100px; }
-        #toastNotification.success { background-color: var(--success-color); color: white; }
-        #toastNotification.error { background-color: var(--danger-color); color: white; }
-        #toastNotification.info { background-color: var(--info-color); color: white; }
+        #page-profile .profile-item strong {
+            color: var(--primary-color);
+        }
+
+        /* Task Page */
+        .task-list {
+            list-style: none;
+            padding: 0;
+        }
+        .task-item {
+            background-color: var(--card-background);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .task-item .task-info {
+            flex-grow: 1;
+        }
+        .task-item .task-name {
+            font-weight: bold;
+        }
+        .task-item .task-reward {
+            font-size: 0.9em;
+            color: #555;
+        }
+        .task-item .task-action button {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .task-item .task-action button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* Withdraw Page */
+        #page-withdraw .form-group {
+            margin-bottom: 15px;
+        }
+        #page-withdraw label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        #page-withdraw input[type="number"],
+        #page-withdraw select {
+            width: calc(100% - 22px); /* Full width minus padding/border */
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        #page-withdraw button {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            width: 100%;
+        }
+        #page-withdraw button:disabled {
+            background-color: #ccc;
+        }
+        #withdraw-history {
+            margin-top: 20px;
+        }
+        #withdraw-history h3 {
+            margin-bottom: 10px;
+        }
+        .history-item {
+            background-color: var(--card-background);
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            font-size: 0.9em;
+        }
+
+        /* General utility */
+        .card {
+            background-color: var(--card-background);
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px_4px rgba(0,0,0,0.1);
+        }
+        .text-center {
+            text-align: center;
+        }
+
+        /* Floating tap score animation */
+        .tap-score-animation {
+            position: absolute;
+            font-size: 1.5em; /* Adjust as needed */
+            color: var(--primary-color); /* Or gold, etc. */
+            font-weight: bold;
+            user-select: none;
+            pointer-events: none;
+            animation: floatUpAndFade 1s forwards;
+            z-index: 100; /* Above the tap button */
+        }
+
+        @keyframes floatUpAndFade {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-50px); /* Adjust vertical distance */
+            }
+        }
 
     </style>
 </head>
 <body>
-    <div id="app">
-        <div id="loadingOverlay">
-            <div class="spinner"></div>
-            Initializing UltraBoost...
-        </div>
+    <div id="app-header">Xot_swap</div>
 
-        <div id="content">
-            <!-- Profile Page -->
-            <div id="profilePage" class="page">
-                <div class="card">
-                    <div class="profile-header">
-                        <img id="profilePic" class="profile-pic" alt="Profile Picture">
-                        <div class="profile-name-id">
-                            <div id="profileNameBig">Loading...</div>
-                            <div id="profileUserIdSmall">ID: Loading...</div>
-                            <span id="leagueBadge" class="league-badge" style="background-color: var(--league-bronze);">Bronze League</span>
-                        </div>
-                    </div>
-
-                    <div class="info-item">
-                        <span><svg viewBox="0 0 24 24" style="width:18px; height:18px; vertical-align:middle; margin-right:5px; fill:currentColor;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm-1-7H9v2h2v2h2v-2h2V9h-2V7h-2v2z"/></svg>Total Points:</span>
-                        <span id="profilePoints">0</span>
-                    </div>
-                    <div class="info-item">
-                        <span>📅 Joined:</span>
-                        <span id="profileJoinDate">Loading...</span>
-                    </div>
-                     <div class="info-item">
-                        <span><svg viewBox="0 0 24 24" style="width:18px; height:18px; vertical-align:middle; margin-right:5px; fill:var(--primary-color);"><path d="M11.92 2.75a.75.75 0 0 1 .58.2l7.5 7.5a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 1 1-1.06-1.06l3.72-3.72-7.44-7.44A.75.75 0 0 1 11.92 2.75zM3.81 9.28a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 1 1 1.06 1.06L5.4 8.75l7.44 7.44a.75.75 0 0 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1-.47-.77z"/></svg> Tap Power:</span>
-                        <span id="profileTapPower">1</span>
-                    </div>
-                    <div class="info-item">
-                        <span>⚡ Max Energy:</span>
-                        <span id="profileMaxEnergy">1000</span>
-                    </div>
-                    <div class="info-item">
-                        <span>🔋 Energy Regen:</span>
-                        <span id="profileEnergyRegen">1/s</span>
-                    </div>
-                    <div class="info-item">
-                        <span>🔗 Referral Link:</span>
-                        <span id="profileReferral">N/A (Demo)</span>
-                    </div>
-                    <button id="dailyRewardButton" class="daily-reward-button">Claim Daily Reward</button>
-                </div>
+    <div class="content-area">
+        <!-- Profile Page -->
+        <div id="page-profile" class="page">
+            <h2>Profile</h2>
+            <div class="card">
+                <div class="profile-item"><strong>Name:</strong> <span id="profile-name"></span></div>
+                <div class="profile-item"><strong>Current Points:</strong> <span id="profile-points"></span></div>
+                <div class="profile-item"><strong>Joined:</strong> <span id="profile-join-date"></span></div>
+                <div class="profile-item"><strong>Referral Link:</strong> <br><span id="profile-referral-link" style="word-break: break-all;"></span></div>
             </div>
-
-            <!-- Tap Page -->
-            <div id="tapPage" class="page active">
-                <div> <!-- Wrapper for top content -->
-                    <div class="tap-header-info">
-                        <span>League: <strong id="tapLeague">Bronze</strong></span>
-                        <span>Tap Power: <strong id="tapPowerDisplay">1</strong></span>
-                    </div>
-                    <div class="score-display">
-                        <span class="score-icon"></span>
-                        <span id="pointsDisplay">0</span>
-                    </div>
-                </div>
-                <div class="tap-area">
-                    <button id="catButton">
-                        <div id="catImage"></div>
-                    </button>
-                </div>
-                <div class="energy-section">
-                     <div class="energy-label">
-                         <span>⚡ Energy</span>
-                         <span id="energyLevel">1000 / 1000</span>
-                    </div>
-                    <div class="energy-bar-container">
-                        <div id="energyBar"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Boosts Page -->
-            <div id="boostsPage" class="page">
-                <div class="card">
-                    <h2>🚀 Boosts & Upgrades</h2>
-                    <p style="text-align: center; color: var(--secondary-color); font-size: 0.95em; margin-top: -10px; margin-bottom: 25px;">
-                        Spend points to enhance your earning potential!
-                    </p>
-                    <ul id="boostList" style="list-style: none; padding: 0;">
-                        <!-- Boost items will be dynamically added here -->
-                    </ul>
-                </div>
-            </div>
-
-            <!-- Task Page -->
-            <div id="taskPage" class="page">
-                 <div class="card">
-                     <h2>🎯 Tasks</h2>
-                     <p style="text-align: center; color: var(--secondary-color); font-size: 0.95em; margin-top: -10px; margin-bottom: 25px;">Complete tasks to earn more points!</p>
-                     <ul id="taskList"></ul>
-                 </div>
-            </div>
-
-            <!-- Withdraw Page -->
-            <div id="withdrawPage" class="page">
-                 <div class="card">
-                     <h2>💸 Withdraw Points</h2>
-                     <p style="text-align: center; color: var(--secondary-color); font-size: 0.95em; margin-bottom: 25px;">Available: <strong id="withdrawPointsAvailable" style="color: var(--text-color); font-weight: 600;">0</strong></p>
-                     <div class="form-group">
-                        <label for="withdrawAmount">Amount:</label>
-                        <input type="number" id="withdrawAmount" placeholder="Enter points to withdraw" min="1">
-                     </div>
-                     <div class="form-group">
-                         <label for="withdrawMethod">Method:</label>
-                         <select id="withdrawMethod">
-                             <option value="paypal">PayPal</option>
-                             <option value="wire">Wire Transfer</option>
-                             <option value="crypto">Crypto (USDT)</option>
-                             <option value="localhost">Localhost Simulation</option>
-                         </select>
-                     </div>
-                     <div id="methodDetails">
-                          <div class="form-group detail-field paypal-field">
-                             <label for="paypalEmail">PayPal Email:</label>
-                             <input type="email" id="paypalEmail" placeholder="your.email@example.com">
-                          </div>
-                          <div class="form-group detail-field wire-field" style="display: none;">
-                             <label for="bankAccount">Bank Account Number:</label>
-                             <input type="text" id="bankAccount" placeholder="Account Number">
-                             <label for="bankRouting" style="margin-top: 10px;">Routing Number:</label>
-                             <input type="text" id="bankRouting" placeholder="Routing Number">
-                          </div>
-                          <div class="form-group detail-field crypto-field" style="display: none;">
-                             <label for="cryptoAddress">USDT Wallet Address (TRC20):</label>
-                             <input type="text" id="cryptoAddress" placeholder="T...">
-                          </div>
-                     </div>
-                     <button id="submitWithdrawal" class="withdraw-button">Request Withdrawal</button>
-                     <p id="withdrawMessage" class="withdraw-message"></p>
-                 </div>
+            <div class="text-center" style="margin-top: 20px;">
+                <p>Bot: <a href="https://t.me/xotswap_bot" target="_blank">t.me/xotswap_bot</a></p>
+                <p>Direct WebApp: <a href="http://t.me/xotswap_bot/Xot" target="_blank">t.me/xotswap_bot/Xot</a></p>
             </div>
         </div>
 
-        <nav id="bottomNav">
-            <button class="nav-button" data-page="profilePage">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-                Profile
-            </button>
-            <button class="nav-button active" data-page="tapPage">
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.92 2.75a.75.75 0 0 1 .58.2l7.5 7.5a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 1 1-1.06-1.06l3.72-3.72-7.44-7.44A.75.75 0 0 1 11.92 2.75zM3.81 9.28a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 1 1 1.06 1.06L5.4 8.75l7.44 7.44a.75.75 0 0 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1-.47-.77z"/></svg>
-                Tap
-            </button>
-            <button class="nav-button" data-page="boostsPage"> <!-- NEW BOOSTS PAGE -->
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 2.5a.75.75 0 01.75.75v3.318a6.754 6.754 0 015.077 5.077h3.318a.75.75 0 010 1.5h-3.318a6.754 6.754 0 01-5.077 5.077v3.318a.75.75 0 01-1.5 0v-3.318A6.754 6.754 0 016.682 13.15H3.364a.75.75 0 010-1.5h3.318A6.754 6.754 0 0111.25 6.568V3.25a.75.75 0 01.75-.75zm0 1.5v2.51a5.254 5.254 0 00-4.058 4.058H5.382a5.233 5.233 0 000 .764h2.51a5.254 5.254 0 004.058 4.058v2.51a5.233 5.233 0 00.764 0v-2.51a5.254 5.254 0 004.058-4.058h2.51a5.233 5.233 0 000-.764h-2.51a5.254 5.254 0 00-4.058-4.058V4a5.233 5.233 0 00-.764 0zM12 9a3 3 0 100 6 3 3 0 000-6zM8.25 12a3.75 3.75 0 117.5 0 3.75 3.75 0 01-7.5 0z"/></svg>
-                Boosts
-            </button>
-            <button class="nav-button" data-page="taskPage">
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M16.5 3h-9C6.12 3 5 4.12 5 5.5v13C5 19.88 6.12 21 7.5 21h9c1.38 0 2.5-1.12 2.5-2.5v-13C19 4.12 17.88 3 16.5 3zM15 18H9v-1.5h6V18zm0-3.5H9V13h6v1.5zm0-3.5H9V8h6v3z"/></svg>
-                Tasks
-            </button>
-            <button class="nav-button" data-page="withdrawPage">
-                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v10zm-4-6H8v-2h8v2z"/></svg>
-                 Wallet
-            </button>
-        </nav>
-        <div id="toastNotification">Toast message</div>
+        <!-- Tap Page -->
+        <div id="page-tap" class="page active">
+            <div id="points-display">0</div>
+            <div id="tap-button-container" style="position: relative;"> <!-- Container for tap button and animations -->
+                <div id="tap-button">
+                    <!-- 
+                        Replace this SVG with your desired image.
+                        For a raster image (PNG, JPG, GIF):
+                        <img id="tap-image" src="YOUR_IMAGE_URL_HERE" alt="Tap Me">
+                        Make sure the image is HD and fits well.
+                    -->
+                    <svg id="tap-image" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Simple Cat SVG - Replace with Hamster or other image -->
+                        <path d="M50 10 C 20 10, 20 40, 20 50 C 20 80, 30 90, 50 90 C 70 90, 80 80, 80 50 C 80 40, 80 10, 50 10 Z M 40 40 Q 45 35, 50 40 Q 55 35, 60 40 Q 55 45, 50 50 Q 45 45, 40 40 Z M 30 60 Q 50 70, 70 60 Q 50 80, 30 60 Z" fill="#FFA500"/>
+                        <circle cx="35" cy="30" r="5" fill="black"/>
+                        <circle cx="65" cy="30" r="5" fill="black"/>
+                        <path d="M45 55 Q50 60 55 55" stroke="black" stroke-width="2" fill="none"/>
+                        <path d="M20 50 A 10 10 0 0 0 10 40 L 10 30 A 5 5 0 0 1 20 30 Z" fill="#FFA500"/>
+                        <path d="M80 50 A 10 10 0 0 1 90 40 L 90 30 A 5 5 0 0 0 80 30 Z" fill="#FFA500"/>
+                    </svg>
+                </div>
+            </div>
+            <div id="energy-container">
+                <span>Energy: <span id="energy-text">100/100</span></span>
+                <div id="energy-bar-bg">
+                    <div id="energy-bar-fill"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Task Page -->
+        <div id="page-task" class="page">
+            <h2>Tasks</h2>
+            <ul id="task-list" class="task-list">
+                <!-- Tasks will be rendered here by JS -->
+            </ul>
+        </div>
+
+        <!-- Withdraw Page -->
+        <div id="page-withdraw" class="page">
+            <h2>Withdraw Points</h2>
+            <div class="card">
+                <div class="form-group">
+                    <label for="withdraw-amount">Amount to Withdraw:</label>
+                    <input type="number" id="withdraw-amount" placeholder="Enter points">
+                </div>
+                <div class="form-group">
+                    <label for="withdraw-method">Withdrawal Method:</label>
+                    <select id="withdraw-method">
+                        <option value="paypal">PayPal</option>
+                        <option value="bank">Wire Transfer</option>
+                        <option value="crypto">Crypto (USDT)</option>
+                    </select>
+                </div>
+                <button id="withdraw-btn">Withdraw</button>
+                <p id="withdraw-message" style="margin-top:10px; text-align:center;"></p>
+            </div>
+            <div id="withdraw-history" class="card">
+                <h3>Withdrawal History (Mock)</h3>
+                <ul id="history-list" style="list-style:none; padding:0;">
+                    <!-- History items will be added here -->
+                </ul>
+            </div>
+        </div>
     </div>
 
+    <nav id="bottom-nav">
+        <button class="nav-btn" data-page="page-profile">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,19.2C9.5,19.2 7.29,17.92 6,15.98C6.03,13.98 10,12.9 12,12.9C14,12.9 17.97,13.98 18,15.98C16.71,17.92 14.5,19.2 12,19.2Z" /></svg>
+            Profile
+        </button>
+        <button class="nav-btn active" data-page="page-tap">
+             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,6H13V13H16L12,17L8,13H11V6M12,20C7.59,20 4,16.41 4,12H6A6,6 0 0,1 12,18A6,6 0 0,1 18,12H20C20,16.41 16.41,20 12,20Z" /></svg>
+            Tap
+        </button>
+        <button class="nav-btn" data-page="page-task">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,13L14.5,15.5L12,18L9.5,15.5L12,13M8,5V7H11V5H8Z" /></svg>
+            Tasks
+        </button>
+        <button class="nav-btn" data-page="page-withdraw">
+            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
+            Withdraw
+        </button>
+    </nav>
+
     <script>
-        const tg = window.Telegram.WebApp;
-
-        // --- DOM Elements ---
-        const loadingOverlay = document.getElementById('loadingOverlay');
-        const content = document.getElementById('content');
-        const pages = document.querySelectorAll('.page');
-        const navButtons = document.querySelectorAll('.nav-button');
-        const pointsDisplay = document.getElementById('pointsDisplay');
-        const profilePoints = document.getElementById('profilePoints');
-        const withdrawPointsAvailable = document.getElementById('withdrawPointsAvailable');
-        const catButton = document.getElementById('catButton');
-        const energyLevelDisplay = document.getElementById('energyLevel');
-        const energyBar = document.getElementById('energyBar');
-        const taskList = document.getElementById('taskList');
-        const profileNameBig = document.getElementById('profileNameBig');
-        const profileUserIdSmall = document.getElementById('profileUserIdSmall');
-        const profileJoinDate = document.getElementById('profileJoinDate');
-        const profileReferral = document.getElementById('profileReferral');
-        const profilePic = document.getElementById('profilePic');
-        const withdrawAmountInput = document.getElementById('withdrawAmount');
-        const withdrawMethodSelect = document.getElementById('withdrawMethod');
-        const submitWithdrawalButton = document.getElementById('submitWithdrawal');
-        const withdrawMessage = document.getElementById('withdrawMessage');
-        const methodDetailsDiv = document.getElementById('methodDetails');
-        const detailFields = methodDetailsDiv.querySelectorAll('.detail-field');
-        const paypalEmailInput = document.getElementById('paypalEmail');
-        const bankAccountInput = document.getElementById('bankAccount');
-        const bankRoutingInput = document.getElementById('bankRouting');
-        const cryptoAddressInput = document.getElementById('cryptoAddress');
-        const toastNotification = document.getElementById('toastNotification');
-        const boostListPage = document.getElementById('boostList'); // New
-        const dailyRewardButton = document.getElementById('dailyRewardButton'); // New
-        const leagueBadge = document.getElementById('leagueBadge'); // New
-        const tapLeague = document.getElementById('tapLeague'); // New
-        const tapPowerDisplay = document.getElementById('tapPowerDisplay'); // New
-        const profileTapPower = document.getElementById('profileTapPower');
-        const profileMaxEnergy = document.getElementById('profileMaxEnergy');
-        const profileEnergyRegen = document.getElementById('profileEnergyRegen');
-
-
-        // --- Game State & Config ---
-        const BASE_MAX_ENERGY = 1000;
-        const BASE_ENERGY_REFILL_RATE = 1; // Energy per second
-        const BASE_TAP_POWER = 1;
-        const DAILY_REWARD_AMOUNT = 500;
-        const LOCAL_STORAGE_KEY = 'tapSwapUltraBoostData_v1'; // NEW KEY
-        const TASK_REWARD = 1000;
-
-        const TASKS = [ /* Unchanged from previous version */
-            { id: 0, title: "Watch Intro Video", description: `+${TASK_REWARD} Points`, completed: false, icon: 'youtube' },
-            { id: 1, title: "Watch Gameplay Tutorial", description: `+${TASK_REWARD} Points`, completed: false, icon: 'youtube' },
-            { id: 2, title: "Follow on X (Twitter)", description: `+${TASK_REWARD} Points`, completed: false, icon: 'generic' },
-            { id: 3, title: "Subscribe to Channel", description: `+${TASK_REWARD} Points`, completed: false, icon: 'youtube' },
-            { id: 4, title: "Join Telegram Group", description: `+${TASK_REWARD} Points`, completed: false, icon: 'generic' },
-        ];
-
-        // NEW: Boosts Configuration
-        const BOOST_CONFIG = {
-            tapPower: {
-                name: 'Tap Power',
-                description: 'Increase points earned per tap.',
-                icon: `<svg viewBox="0 0 24 24"><path d="M11.92 2.75a.75.75 0 0 1 .58.2l7.5 7.5a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 1 1-1.06-1.06l3.72-3.72-7.44-7.44A.75.75 0 0 1 11.92 2.75zM3.81 9.28a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 1 1 1.06 1.06L5.4 8.75l7.44 7.44a.75.75 0 0 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1-.47-.77z"/></svg>`,
-                levels: [
-                    { cost: 0, value: 1 }, { cost: 500, value: 2 }, { cost: 2000, value: 3 },
-                    { cost: 5000, value: 4 }, { cost: 10000, value: 5 }, { cost: 25000, value: 7 },
-                    { cost: 50000, value: 10 }, { cost: 100000, value: 15 }, {cost: 250000, value: 20}, {cost: 500000, value: 30}
-                ]
-            },
-            energyLimit: {
-                name: 'Energy Limit',
-                description: 'Increase your maximum energy capacity.',
-                icon: `<svg viewBox="0 0 24 24"><path d="M12 21.75a9.75 9.75 0 000-19.5V5.5a6.5 6.5 0 010 13V21.75zM12 4a7.96 7.96 0 00-5.59 2.28.75.75 0 11-1.03-1.1A9.46 9.46 0 0112 2.5a9.5 9.5 0 016.62 15.18.75.75 0 11-1.03-1.1A7.96 7.96 0 0012 4zm0 6.5a.75.75 0 01.75.75v3.5a.75.75 0 01-1.5 0v-3.5A.75.75 0 0112 10.5z"/></svg>`,
-                levels: [
-                    { cost: 0, value: BASE_MAX_ENERGY }, { cost: 500, value: 1500 }, { cost: 2000, value: 2000 },
-                    { cost: 5000, value: 3000 }, { cost: 10000, value: 4000 }, { cost: 25000, value: 5000 },
-                    { cost: 50000, value: 7500 }, { cost: 100000, value: 10000 }, {cost: 250000, value: 15000}, {cost: 500000, value: 20000}
-                ]
-            },
-            energyRegen: {
-                name: 'Energy Regen',
-                description: 'Increase energy regeneration speed.',
-                icon: `<svg viewBox="0 0 24 24"><path d="M12.75 3.5a.75.75 0 00-1.5 0V7.25H9.5a.75.75 0 000 1.5h1.75v3.5H9.5a.75.75 0 000 1.5h1.75V18a3.25 3.25 0 006.5 0V7.973c2.076.56 3.5 2.457 3.5 4.777a.75.75 0 001.5 0c0-3.18-2.09-5.826-5-6.527V3.5zM16 18a1.75 1.75 0 11-3.5 0V9.25h3.5V18z"/></svg>`,
-                levels: [
-                    { cost: 0, value: BASE_ENERGY_REFILL_RATE }, { cost: 1000, value: 2 }, { cost: 3000, value: 3 },
-                    { cost: 7000, value: 4 }, { cost: 15000, value: 5 }, { cost: 30000, value: 7 },
-                    { cost: 60000, value: 10 }, { cost: 120000, value: 15 }, {cost: 300000, value: 20}, {cost: 600000, value: 30}
-                ]
-            }
-        };
-
-        // NEW: League Configuration
-        const LEAGUES = [
-            { name: "Bronze", minPoints: 0, color: "var(--league-bronze)" },
-            { name: "Silver", minPoints: 10000, color: "var(--league-silver)" },
-            { name: "Gold", minPoints: 100000, color: "var(--league-gold)" },
-            { name: "Platinum", minPoints: 500000, color: "var(--league-platinum)", textColor: "#333" },
-            { name: "Diamond", minPoints: 1000000, color: "var(--league-diamond)", textColor: "#333" },
-            { name: "Master", minPoints: 5000000, color: "var(--primary-color)"},
-            { name: "Grandmaster", minPoints: 10000000, color: "#8A2BE2"}, // Purple
-            { name: "Legend", minPoints: 50000000, color: "#FF4500"} // OrangeRed
-        ];
-
-
-        let userData = {
-            points: 0,
-            energy: BASE_MAX_ENERGY,
-            lastEnergyUpdate: Date.now(),
-            joinDate: null,
-            tasks: TASKS.map(task => ({ id: task.id, completed: false })),
-            telegramUser: null,
-            // NEW: Boost levels
-            boostLevels: {
-                tapPower: 0,
-                energyLimit: 0,
-                energyRegen: 0
-            },
-            dailyRewardLastClaimed: null,
-        };
-
-        // --- Initialization ---
-        function initApp() {
-            console.log("Initializing App (UltraBoost UI)...");
-            tg.ready();
-            applyTheme();
-            tg.onEvent('themeChanged', applyTheme);
-            tg.expand();
-            try { tg.disableVerticalSwipes(); } catch (e) { console.warn("disableVerticalSwipes not supported:", e.message); }
-
-            loadData();
-            updateCurrentMaxEnergy(); // Ensure this is called after loading data
-            updateCurrentTapPower();
-            updateCurrentEnergyRegenRate();
-
-
-            if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-                userData.telegramUser = tg.initDataUnsafe.user;
-                if (!userData.joinDate) {
-                     userData.joinDate = new Date().toISOString();
-                     saveData();
-                }
-            } else {
-                console.warn("Telegram user data not available.");
-                 if (!userData.joinDate) userData.joinDate = new Date().toISOString(); // Set join date for guest too
-            }
-            displayProfileInfo(); // Now includes league and boost levels
-            generateReferralLink();
-
-
-            updatePointsDisplay();
-            refillEnergy(); // Initial refill calculation
-            updateEnergyDisplay();
-            renderTasks();
-            renderBoostsPage(); // New
-            updateDailyRewardButton(); // New
-
-            showPage('tapPage');
-            setupEventListeners();
-            setInterval(refillEnergy, 1000);
-
-            setTimeout(() => {
-                 loadingOverlay.style.opacity = '0';
-                 setTimeout(() => { loadingOverlay.style.display = 'none'; }, 300);
-            }, 500); // Slightly longer for effect
-
-             console.log("App Initialized (UltraBoost UI).");
-        }
-
-        // --- Theme Application (mostly unchanged) ---
-        function applyTheme() { /* ... same as previous ... */
-            const themeParams = tg.themeParams || {};
-            const root = document.documentElement.style;
-            const setVar = (varName, tgValue, fallbackValue) => root.setProperty(varName, tgValue || fallbackValue);
-
-            setVar('--primary-color', themeParams.button_color, 'var(--fallback-button-color)');
-            setVar('--secondary-color', themeParams.hint_color, 'var(--fallback-hint-color)');
-            setVar('--background-color', themeParams.bg_color, 'var(--fallback-bg-color)');
-            setVar('--text-color', themeParams.text_color, 'var(--fallback-text-color)');
-            setVar('--card-bg', themeParams.secondary_bg_color, 'var(--fallback-secondary-bg-color)');
-            setVar('--bottom-nav-bg', themeParams.secondary_bg_color, 'var(--fallback-secondary-bg-color)');
-            setVar('--fallback-button-text-color', themeParams.button_text_color, '#ffffff');
-            setVar('--bottom-nav-icon-active-color', themeParams.button_color, 'var(--fallback-link-color)');
-            setVar('--border-color', themeParams.secondary_bg_color ? colorMix(themeParams.secondary_bg_color, themeParams.hint_color || '#888888', 0.1) : 'var(--fallback-border-color, #e1e4e8)');
-
-            const isDark = tg.colorScheme === 'dark' || (themeParams.bg_color && isColorDark(themeParams.bg_color));
-            document.body.classList.toggle('dark', isDark);
-        }
-        function colorMix(c1,c2,w) { /* ... same as previous ... */ return c2 || '#e0e0e0';}
-        function isColorDark(hex) { /* ... same as previous ... */ if(!hex) return false; try {const rgb=parseInt(hex.slice(1),16),r=(rgb>>16)&0xff,g=(rgb>>8)&0xff,b=(rgb>>0)&0xff,lum=(0.2126*r+0.7152*g+0.0722*b)/255; return lum<0.5;} catch(e){return false;} }
-
-        // --- Data Persistence ---
-        function saveData() {
-            try {
-                localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(userData));
-            } catch (e) {
-                console.error("Error saving data to localStorage:", e);
-                showToast('Could not save progress.', 'error');
-            }
-        }
-
-        function loadData() {
-            const savedData = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (savedData) {
-                try {
-                    const parsedData = JSON.parse(savedData);
-                    userData.points = Number(parsedData.points) || 0;
-                    userData.lastEnergyUpdate = Number(parsedData.lastEnergyUpdate) || Date.now();
-                    userData.joinDate = parsedData.joinDate || null;
-                    userData.telegramUser = parsedData.telegramUser || userData.telegramUser;
-                    
-                    // Load tasks (same as before)
-                    const loadedTasks = parsedData.tasks || [];
-                    const currentTaskMap = new Map(loadedTasks.map(t => [t.id, t.completed]));
-                    userData.tasks = TASKS.map(taskDef => ({
-                        id: taskDef.id,
-                        completed: currentTaskMap.get(taskDef.id) || false
-                    }));
-
-                    // NEW: Load boost levels
-                    userData.boostLevels = {
-                        tapPower: Number(parsedData.boostLevels?.tapPower) || 0,
-                        energyLimit: Number(parsedData.boostLevels?.energyLimit) || 0,
-                        energyRegen: Number(parsedData.boostLevels?.energyRegen) || 0,
-                    };
-                    // Ensure energy is not more than new maxEnergy after loading boosts
-                    updateCurrentMaxEnergy(); // Calculate current max based on boost
-                    userData.energy = Math.min(Number(parsedData.energy) || 0, userData.currentMaxEnergy);
-
-
-                    userData.dailyRewardLastClaimed = parsedData.dailyRewardLastClaimed || null;
-
-                    console.log("Data loaded:", userData);
-                } catch (e) {
-                    console.error("Error parsing saved data:", e);
-                     localStorage.removeItem(LOCAL_STORAGE_KEY);
-                     if (!userData.joinDate) userData.joinDate = new Date().toISOString();
-                }
-            } else {
-                 console.log("No saved data found, using defaults.");
-                 if (!userData.joinDate) userData.joinDate = new Date().toISOString();
-                 updateCurrentMaxEnergy(); // Set initial max energy
-                 userData.energy = userData.currentMaxEnergy; // Start with full energy
-                 saveData(); // Save initial default state
-            }
-        }
-
-        // --- Current Stat Calculation ---
-        function updateCurrentTapPower() {
-            userData.currentTapPower = BOOST_CONFIG.tapPower.levels[userData.boostLevels.tapPower].value;
-        }
-        function updateCurrentMaxEnergy() {
-            userData.currentMaxEnergy = BOOST_CONFIG.energyLimit.levels[userData.boostLevels.energyLimit].value;
-        }
-        function updateCurrentEnergyRegenRate() {
-            userData.currentEnergyRegenRate = BOOST_CONFIG.energyRegen.levels[userData.boostLevels.energyRegen].value;
-        }
-
-
-        // --- UI Update Functions ---
-        function updatePointsDisplay() {
-            const formattedPoints = Math.floor(userData.points).toLocaleString('en-US');
-            pointsDisplay.textContent = formattedPoints;
-            profilePoints.textContent = formattedPoints;
-            withdrawPointsAvailable.textContent = formattedPoints;
-            if(withdrawAmountInput) withdrawAmountInput.max = Math.floor(userData.points);
-            updateWithdrawButtonState();
-            updateLeagueDisplay(); // Update league whenever points change
-            renderBoostsPage(); // Re-render boosts to update button states
-        }
-
-        function updateEnergyDisplay() {
-             const currentEnergy = Math.floor(userData.energy);
-             const maxEnergy = userData.currentMaxEnergy;
-             energyLevelDisplay.textContent = `${currentEnergy.toLocaleString('en-US')} / ${maxEnergy.toLocaleString('en-US')}`;
-             const energyPercentage = maxEnergy > 0 ? (currentEnergy / maxEnergy) * 100 : 0;
-             energyBar.style.width = `${Math.min(100, energyPercentage)}%`;
-        }
-
-        function displayProfileInfo() {
-            if (userData.telegramUser) {
-                profileNameBig.textContent = `${userData.telegramUser.first_name || ''} ${userData.telegramUser.last_name || ''}`.trim() || 'Telegram User';
-                profileUserIdSmall.textContent = `ID: ${userData.telegramUser.id || 'N/A'}`;
-                if (userData.telegramUser.photo_url) {
-                    profilePic.src = userData.telegramUser.photo_url;
-                    profilePic.style.backgroundImage = 'none';
-                    profilePic.onerror = () => { profilePic.src = ''; profilePic.style.backgroundImage = `url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%23e0e0e0"/><path d="M50 42c-8.8 0-16 7.2-16 16s7.2 16 16 16 16-7.2 16-16-7.2-16-16-16zm0 28c-6.6 0-12-5.4-12-12s5.4-12 12-12 12 5.4 12 12-5.4 12-12 12z" fill="%23a0a0a0"/><path d="M76 64c0-11-8.5-20-19.3-21.7 1.1-1.6 1.8-3.5 1.8-5.6 0-5.5-4.5-10-10-10s-10 4.5-10 10c0 2.1.6 4 1.8 5.6C28.5 44 20 53 20 64v6h60v-6z" fill="%23a0a0a0"/></svg>')`; }
-                } else { /* Default SVG as before */ }
-            } else {
-                profileNameBig.textContent = "Guest User";
-                profileUserIdSmall.textContent = "ID: N/A";
-            }
-            profileJoinDate.textContent = userData.joinDate ? new Date(userData.joinDate).toLocaleDateString() : 'N/A';
-            profileTapPower.textContent = userData.currentTapPower.toLocaleString();
-            profileMaxEnergy.textContent = userData.currentMaxEnergy.toLocaleString();
-            profileEnergyRegen.textContent = `${userData.currentEnergyRegenRate.toLocaleString()}/s`;
-            updateLeagueDisplay();
-        }
-
-        function generateReferralLink() { /* ... same as previous ... */
-             const refSpan = profileReferral;
-             if (userData.telegramUser && userData.telegramUser.id) {
-                 const botUsername = 'YourUltraBoostBot'; // Replace with your bot's username
-                 const link = `t.me/${botUsername}?start=${userData.telegramUser.id}`;
-                 refSpan.textContent = link;
-                 refSpan.onclick = () => { try { tg.openTelegramLink(link); } catch (e) { console.error("Failed to open TG link", e); } };
-                 refSpan.style.cursor = 'pointer';
-                 refSpan.style.color = 'var(--tg-theme-link-color, var(--fallback-link-color))';
-             } else {
-                 refSpan.textContent = 'N/A (Login for link)';
-                 refSpan.onclick = null; refSpan.style.cursor = 'default'; refSpan.style.color = 'var(--text-color)';
-             }
-        }
+        // Attempt to use Telegram WebApp SDK for user data
+        const tg = window.Telegram?.WebApp;
         
-        function updateLeagueDisplay() {
-            const currentLeague = LEAGUES.slice().reverse().find(l => userData.points >= l.minPoints) || LEAGUES[0];
-            leagueBadge.textContent = `${currentLeague.name} League`;
-            leagueBadge.style.backgroundColor = currentLeague.color;
-            leagueBadge.style.color = currentLeague.textColor || 'white'; // Use custom text color if defined, else white
-            tapLeague.textContent = currentLeague.name;
-        }
+        const app = {
+            userData: {
+                userName: "Guest",
+                userId: null, // Store Telegram user ID if available
+                joiningDate: new Date().toISOString(),
+                points: 0,
+                energy: 100,
+                maxEnergy: 500, // Initial max energy
+                energyPerTap: 1,   // Energy consumed per tap
+                pointsPerTap: 1,   // Points gained per tap
+                energyRegenRate: 1, // Energy points per second
+                lastEnergyUpdate: Date.now(),
+                tasks: [
+                    { id: "yt1", name: "Watch Tech Review 📺", reward: 1000, completed: false, url: "https://www.youtube.com/embed/M7lc1qf-
+                    ms" }, // Example: MKBHD video
+                    { id: "yt2", name: "Learn Coding Basics 💻", reward: 1000, completed: false, url: "https://www.youtube.com/embed/zOjov-2OZ0E" }, // Example: FreeCodeCamp video
+                    { id: "yt3", name: "SpaceX Starship Update 🚀", reward: 1000, completed: false, url: "https://www.youtube.com/embed/uRk339ablko" }, // Example: SpaceX video
+                    { id: "yt4", name: "Funny Cat Compilation 😹", reward: 1000, completed: false, url: "https://www.youtube.com/embed/short-funny-cats" }, // Example: Placeholder for generic cat video
+                    { id: "yt5", name: "Travel Vlog: Japan 🌸", reward: 1000, completed: false, url: "https://www.youtube.com/embed/Iaoy3QEJ9n8" } // Example: Travel vlog
+                ],
+                referralLink: "t.me/xotswap_bot?start=REF_PLACEHOLDER",
+                withdrawals: []
+            },
+            config: {
+                localStorageKey: 'xotSwapData_v1' // Versioning for easier future migrations
+            },
 
-
-        // --- Navigation ---
-        function showPage(pageId) { /* ... same as previous, added boostsPage case ... */
-            let foundPage = false;
-            pages.forEach(page => {
-                const isActive = page.id === pageId;
-                page.classList.toggle('active', isActive);
-                if(isActive) foundPage = true;
-            });
-
-            if (!foundPage) {
-                 console.warn(`Page ID "${pageId}" not found, defaulting to tapPage.`);
-                 pageId = 'tapPage';
-                 document.getElementById('tapPage').classList.add('active');
-            }
-
-            navButtons.forEach(button => button.classList.toggle('active', button.dataset.page === pageId));
-            if (content) content.scrollTop = 0;
-
-            switch(pageId) {
-                case 'profilePage': displayProfileInfo(); updatePointsDisplay(); updateDailyRewardButton(); break;
-                case 'taskPage': renderTasks(); updatePointsDisplay(); break;
-                case 'withdrawPage': updatePointsDisplay(); updateWithdrawMethodDetails(); updateWithdrawButtonState(); break;
-                case 'boostsPage': renderBoostsPage(); updatePointsDisplay(); break; // NEW
-                case 'tapPage': default:
-                    updatePointsDisplay();
-                    updateEnergyDisplay();
-                    tapPowerDisplay.textContent = userData.currentTapPower.toLocaleString(); // Update tap power on tap page
-                    break;
-            }
-            console.log("Showing page:", pageId);
-        }
-
-        // --- Game Logic ---
-        function handleTap(event) {
-            const tapCost = 1; // Could be a variable if some taps cost more
-            if (userData.energy >= tapCost) {
-                 const now = Date.now();
-                 if (catButton.dataset.lastTap && (now - parseInt(catButton.dataset.lastTap) < 50)) return; // Debounce
-                 catButton.dataset.lastTap = now.toString();
-
-                userData.points += userData.currentTapPower; // Use current tap power
-                userData.energy = Math.max(0, userData.energy - tapCost);
-                userData.lastEnergyUpdate = Date.now();
-
-                updatePointsDisplay();
-                updateEnergyDisplay();
-                saveData();
-
-                const x = event.clientX || (catButton.offsetLeft + catButton.offsetWidth / 2);
-                const y = event.clientY || (catButton.offsetTop + catButton.offsetHeight / 2);
-                createFloatingText(`+${userData.currentTapPower}`, x, y);
-
-                try { tg.HapticFeedback.impactOccurred('light'); } catch(e) {}
-            } else {
-                 try { tg.HapticFeedback.notificationOccurred('error'); } catch(e) {}
-                 const energySection = document.querySelector('.energy-section');
-                 if(energySection) {
-                    energySection.classList.add('shake');
-                    setTimeout(() => energySection.classList.remove('shake'), 300);
-                 }
-            }
-        }
-
-        function createFloatingText(text, x, y) { /* ... same as previous ... */
-            const feedback = document.createElement('div');
-            feedback.textContent = text; feedback.className = 'tap-feedback';
-            feedback.style.left = `${x}px`; feedback.style.top = `${y}px`;
-            feedback.style.transform = 'translate(-50%, -100%)';
-            document.body.appendChild(feedback);
-            feedback.addEventListener('animationend', () => feedback.remove());
-        }
-
-        function refillEnergy() {
-            const now = Date.now();
-            const timeElapsed = (now - userData.lastEnergyUpdate) / 1000; // seconds
-
-            if (userData.energy < userData.currentMaxEnergy && timeElapsed > 0) {
-                const energyToRefill = timeElapsed * userData.currentEnergyRegenRate; // Use current regen rate
-                const prevEnergyFloor = Math.floor(userData.energy);
-                userData.energy = Math.min(userData.currentMaxEnergy, userData.energy + energyToRefill);
-                const currentEnergyFloor = Math.floor(userData.energy);
-
-                if (currentEnergyFloor > prevEnergyFloor || (userData.energy === userData.currentMaxEnergy && prevEnergyFloor < currentEnergyFloor)) {
-                    userData.lastEnergyUpdate = now; // Only update if a change occurred or maxed out
-                    saveData();
-                    updateEnergyDisplay();
-                }
-            } else if (userData.energy >= userData.currentMaxEnergy) {
-                 userData.lastEnergyUpdate = now; // Keep timestamp current even when full
-                 // No need to save if it was already full and no energy added.
-            }
-        }
-
-
-        // --- Task Logic (mostly unchanged) ---
-        function renderTasks() { /* ... same as previous ... */
-            taskList.innerHTML = '';
-            TASKS.forEach((taskInfo) => {
-                const userTaskData = userData.tasks.find(t => t.id === taskInfo.id);
-                const isCompleted = userTaskData ? userTaskData.completed : false;
-                const li = document.createElement('li');
-                let iconSvg = getTaskIconSvg(taskInfo.icon);
-                li.innerHTML = `
-                     <span class="task-icon ${taskInfo.icon}-icon">${iconSvg}</span>
-                    <div class="task-info">
-                        <div class="task-title">${taskInfo.title}</div>
-                        <div class="task-reward">
-                            <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm-1-7H9v2h2v2h2v-2h2V9h-2V7h-2v2z"/></svg>
-                            ${taskInfo.description}
-                        </div>
-                    </div>
-                    <button class="task-button" data-task-id="${taskInfo.id}" ${isCompleted ? 'disabled' : ''}>
-                        ${isCompleted ? 'Claimed' : 'Go'}
-                    </button>
-                `;
-                const button = li.querySelector('.task-button');
-                if (isCompleted) { button.classList.add('completed'); button.textContent = 'Claimed'; }
-                else { button.addEventListener('click', () => completeTask(taskInfo.id)); }
-                taskList.appendChild(li);
-            });
-        }
-        function getTaskIconSvg(iconType) { /* ... same as previous ... */
-             switch(iconType) {
-                 case 'youtube': return `<svg viewBox="0 0 24 24"><path d="M21.58 7.19c-.23-.86-.9-1.52-1.76-1.76C18.25 5 12 5 12 5s-6.25 0-7.82.43c-.86.24-1.52.9-1.76 1.76C2 8.75 2 12 2 12s0 3.25.43 4.81c.23.86.9 1.52 1.76 1.76C5.75 19 12 19 12 19s6.25 0 7.82-.43c.86-.24-1.52.9-1.76 1.76C22 15.25 22 12 22 12s0-3.25-.42-4.81zM10 15V9l5.2 3-5.2 3z"/></svg>`;
-                 case 'generic': default: return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>`;
-             }
-        }
-        function completeTask(taskId) { /* ... same as previous, uses showToast ... */
-            const taskIndex = userData.tasks.findIndex(t => t.id === taskId);
-            const taskInfo = TASKS.find(t => t.id === taskId);
-            if (taskIndex !== -1 && taskInfo && !userData.tasks[taskIndex].completed) {
-                const button = taskList.querySelector(`.task-button[data-task-id="${taskId}"]`);
-                if(button) button.disabled = true;
-                setTimeout(() => {
-                    try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-                    userData.tasks[taskIndex].completed = true;
-                    userData.points += TASK_REWARD;
-                    updatePointsDisplay();
-                    saveData();
-                    renderTasks();
-                    showToast(`Task Complete! +${TASK_REWARD.toLocaleString()} points.`, 'success');
-                }, 500);
-            }
-        }
-
-        // --- Withdraw Logic (mostly unchanged, uses showToast) ---
-         function updateWithdrawMethodDetails() { /* ... same as previous ... */
-             const selectedMethod = withdrawMethodSelect.value;
-             detailFields.forEach(field => { field.style.display = field.classList.contains(`${selectedMethod}-field`) ? 'block' : 'none'; });
-         }
-         function updateWithdrawButtonState() { /* ... same as previous ... */
-             if (!withdrawAmountInput || !submitWithdrawalButton) return;
-             const amount = parseFloat(withdrawAmountInput.value) || 0;
-             const currentPoints = Math.floor(userData.points); const minWithdrawal = 1;
-             let requiredDetailsFilled = true;
-             const selectedMethod = withdrawMethodSelect.value;
-             if (selectedMethod === 'paypal' && (!paypalEmailInput || !paypalEmailInput.value)) requiredDetailsFilled = false;
-             else if (selectedMethod === 'wire' && (!bankAccountInput || !bankAccountInput.value || !bankRoutingInput || !bankRoutingInput.value)) requiredDetailsFilled = false;
-             else if (selectedMethod === 'crypto' && (!cryptoAddressInput || !cryptoAddressInput.value)) requiredDetailsFilled = false;
-             submitWithdrawalButton.disabled = !(amount >= minWithdrawal && amount <= currentPoints && requiredDetailsFilled);
-         }
-        function handleWithdraw() { /* ... same as previous, uses showToast ... */
-            if (!withdrawAmountInput || !withdrawMethodSelect || !submitWithdrawalButton || !withdrawMessage || !paypalEmailInput || !bankAccountInput || !bankRoutingInput || !cryptoAddressInput) return;
-            const amount = parseFloat(withdrawAmountInput.value); const method = withdrawMethodSelect.value;
-            withdrawMessage.style.display = 'none'; withdrawMessage.textContent = ''; withdrawMessage.className = 'withdraw-message';
-            if (isNaN(amount) || amount <= 0) { showWithdrawMessage('Please enter a valid positive amount.', 'error'); return; }
-            const minWithdrawal = 1; if (amount < minWithdrawal) { showWithdrawMessage(`Minimum withdrawal amount is ${minWithdrawal} points.`, 'error'); return; }
-            if (amount > userData.points) { showWithdrawMessage('Insufficient points.', 'error'); return; }
-            let detailsValid = true; let detailsPayload = { amount, method }; const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (method === 'paypal') { const email = paypalEmailInput.value.trim(); if (!email || !emailRegex.test(email)) { detailsValid = false; paypalEmailInput.focus(); } detailsPayload.email = email; }
-            else if (method === 'wire') { const accNum = bankAccountInput.value.trim(); const routNum = bankRoutingInput.value.trim(); if (!accNum) { detailsValid = false; bankAccountInput.focus(); } else if (!routNum) { detailsValid = false; bankRoutingInput.focus(); } detailsPayload.account = accNum; detailsPayload.routing = routNum; }
-            else if (method === 'crypto') { const address = cryptoAddressInput.value.trim(); if (!address || address.length < 26 || address.length > 42 || !address.startsWith('T')) { detailsValid = false; cryptoAddressInput.focus(); } detailsPayload.address = address; }
-            if (!detailsValid) { showWithdrawMessage('Please fill required details correctly.', 'error'); return; }
-            submitWithdrawalButton.disabled = true; submitWithdrawalButton.textContent = 'Processing...';
-            setTimeout(() => {
-                userData.points -= amount; updatePointsDisplay(); saveData();
-                showWithdrawMessage(`Withdrawal for ${amount.toLocaleString()} points via ${method} submitted (Simulation).`, 'success');
-                try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-                withdrawAmountInput.value = ''; paypalEmailInput.value = ''; bankAccountInput.value = ''; bankRoutingInput.value = ''; cryptoAddressInput.value = '';
-                submitWithdrawalButton.textContent = 'Request Withdrawal'; updateWithdrawButtonState();
-            }, 1500);
-        }
-        function showWithdrawMessage(message, type = 'info') { /* ... same as previous ... */
-             withdrawMessage.textContent = message; withdrawMessage.className = `withdraw-message ${type}`;
-             withdrawMessage.style.display = 'block'; if (type === 'error') { try { tg.HapticFeedback.notificationOccurred('error'); } catch(e) {} }
-         }
-
-        // --- NEW: Boosts Logic ---
-        function renderBoostsPage() {
-            boostListPage.innerHTML = '';
-            Object.keys(BOOST_CONFIG).forEach(boostKey => {
-                const boost = BOOST_CONFIG[boostKey];
-                const currentLevel = userData.boostLevels[boostKey];
-                const isMaxLevel = currentLevel >= boost.levels.length - 1;
-                const nextLevelInfo = !isMaxLevel ? boost.levels[currentLevel + 1] : null;
-                const currentLevelInfo = boost.levels[currentLevel];
-
-                const li = document.createElement('li');
-                li.className = 'boost-item';
-                li.innerHTML = `
-                    <div class="boost-icon">${boost.icon}</div>
-                    <div class="boost-info">
-                        <div class="boost-title">${boost.name}</div>
-                        <div class="boost-description">Current: Lv. ${currentLevel + 1} (${formatBoostValue(boostKey, currentLevelInfo.value)})</div>
-                        ${!isMaxLevel ? `<div class="boost-level">Next: Lv. ${currentLevel + 2} (${formatBoostValue(boostKey, nextLevelInfo.value)})</div>` : ''}
-                        ${!isMaxLevel ? `<div class="boost-cost">Cost: ${nextLevelInfo.cost.toLocaleString()} pts</div>` : '<div class="boost-level" style="color: var(--success-color);">Max Level Reached!</div>'}
-                    </div>
-                    <button class="boost-button" data-boost-key="${boostKey}" ${isMaxLevel ? 'disabled' : ''}>
-                        ${isMaxLevel ? 'Maxed' : 'Upgrade'}
-                    </button>
-                `;
-                const button = li.querySelector('.boost-button');
-                if (isMaxLevel) {
-                    button.classList.add('maxed');
-                } else {
-                    button.disabled = userData.points < nextLevelInfo.cost;
-                    button.addEventListener('click', () => purchaseBoost(boostKey));
-                }
-                boostListPage.appendChild(li);
-            });
-        }
-
-        function formatBoostValue(boostKey, value) {
-            switch (boostKey) {
-                case 'tapPower': return `${value.toLocaleString()} pts/tap`;
-                case 'energyLimit': return `${value.toLocaleString()} max`;
-                case 'energyRegen': return `${value.toLocaleString()}/sec`;
-                default: return value.toLocaleString();
-            }
-        }
-
-        function purchaseBoost(boostKey) {
-            const boost = BOOST_CONFIG[boostKey];
-            const currentLevel = userData.boostLevels[boostKey];
-
-            if (currentLevel >= boost.levels.length - 1) {
-                showToast('Already at max level for this boost.', 'info');
-                return;
-            }
-
-            const nextLevelInfo = boost.levels[currentLevel + 1];
-            if (userData.points >= nextLevelInfo.cost) {
-                userData.points -= nextLevelInfo.cost;
-                userData.boostLevels[boostKey]++;
-
-                // Update relevant stats based on boost type
-                if (boostKey === 'tapPower') updateCurrentTapPower();
-                if (boostKey === 'energyLimit') {
-                    updateCurrentMaxEnergy();
-                    // If current energy is now less than newly increased max energy, it's fine.
-                    // If it was somehow above (shouldn't happen), cap it.
-                    userData.energy = Math.min(userData.energy, userData.currentMaxEnergy);
-                }
-                if (boostKey === 'energyRegen') updateCurrentEnergyRegenRate();
-
-
-                saveData();
-                updatePointsDisplay();
-                updateEnergyDisplay(); // In case max energy changed
-                displayProfileInfo(); // Update profile stats
-                renderBoostsPage(); // Re-render to update buttons and info
-                showToast(`${boost.name} upgraded to Level ${userData.boostLevels[boostKey] + 1}!`, 'success');
-                try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-
-                // Update tap page if active
-                if (document.getElementById('tapPage').classList.contains('active')) {
-                    tapPowerDisplay.textContent = userData.currentTapPower.toLocaleString();
+            init: function() {
+                if (tg) {
+                    tg.ready(); // Inform Telegram an app is ready
+                    tg.expand(); // Expand the webapp to full height
+                    // Use actual Telegram user data if available
+                    if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                        const user = tg.initDataUnsafe.user;
+                        this.userData.userName = user.first_name + (user.last_name ? ' ' + user.last_name : '') || user.username || "Telegram User";
+                        this.userData.userId = user.id;
+                        this.userData.referralLink = `https://t.me/xotswap_bot?start=${user.id}`;
+                    }
                 }
 
-            } else {
-                showToast('Not enough points to upgrade.', 'error');
-                try { tg.HapticFeedback.notificationOccurred('error'); } catch(e) {}
-            }
-        }
+                this.loadData();
+                this.initNavigation();
+                this.updateAllDisplays();
+                this.renderTasks();
+                this.renderProfile();
+                this.renderWithdrawHistory();
 
-        // --- NEW: Daily Reward Logic ---
-        function updateDailyRewardButton() {
-            const today = new Date().toDateString();
-            if (userData.dailyRewardLastClaimed === today) {
-                dailyRewardButton.textContent = 'Reward Claimed Today';
-                dailyRewardButton.disabled = true;
-            } else {
-                dailyRewardButton.textContent = `Claim Daily Reward (+${DAILY_REWARD_AMOUNT.toLocaleString()})`;
-                dailyRewardButton.disabled = false;
-            }
-        }
+                document.getElementById('tap-button').addEventListener('click', (event) => this.handleTap(event));
+                document.getElementById('withdraw-btn').addEventListener('click', () => this.handleWithdraw());
+                
+                setInterval(() => this.regenerateEnergy(), 1000); // Regenerate energy every second
 
-        function claimDailyReward() {
-            const today = new Date().toDateString();
-            if (userData.dailyRewardLastClaimed !== today) {
-                userData.points += DAILY_REWARD_AMOUNT;
-                userData.dailyRewardLastClaimed = today;
-                saveData();
-                updatePointsDisplay();
-                updateDailyRewardButton();
-                showToast(`Daily reward of ${DAILY_REWARD_AMOUNT.toLocaleString()} points claimed!`, 'success');
-                try { tg.HapticFeedback.notificationOccurred('success'); } catch(e) {}
-            } else {
-                showToast('Daily reward already claimed today.', 'info');
-            }
-        }
+                // Set initial active page (Tap page)
+                this.showPage('page-tap'); 
+                document.querySelector(`.nav-btn[data-page="page-tap"]`).classList.add('active');
+            },
 
-        // --- Toast Notification Utility ---
-        let toastTimeout;
-        function showToast(message, type = 'info') { // types: info, success, error
-            toastNotification.textContent = message;
-            toastNotification.className = 'toast-notification'; // Reset classes
-            toastNotification.classList.add(type);
-            toastNotification.classList.add('show');
-
-            clearTimeout(toastTimeout);
-            toastTimeout = setTimeout(() => {
-                toastNotification.classList.remove('show');
-            }, 3000);
-        }
-
-
-        // --- Event Listeners Setup ---
-        function setupEventListeners() {
-            navButtons.forEach(button => {
-                button.addEventListener('click', () => showPage(button.dataset.page));
-            });
-
-            let isDragging = false; let startY = 0;
-            catButton.addEventListener('pointerdown', (e) => { /* ... same as previous ... */
-                if (e.pointerType === 'touch') e.preventDefault(); catButton.setPointerCapture(e.pointerId);
-                isDragging = false; startY = e.clientY;
-            }, { passive: false });
-            catButton.addEventListener('pointermove', (e) => { if (Math.abs(e.clientY - startY) > 10) isDragging = true; });
-            catButton.addEventListener('pointerup', (e) => { catButton.releasePointerCapture(e.pointerId); if (!isDragging) handleTap(e); isDragging = false; });
-            catButton.addEventListener('click', (e) => { if (typeof window.PointerEvent === 'undefined') handleTap(e); });
-
-            if (withdrawMethodSelect) { /* ... same as previous ... */
-                 withdrawMethodSelect.addEventListener('change', () => { updateWithdrawMethodDetails(); updateWithdrawButtonState(); });
-            }
-            const withdrawalInputs = [withdrawAmountInput, paypalEmailInput, bankAccountInput, bankRoutingInput, cryptoAddressInput];
-            withdrawalInputs.forEach(input => { /* ... same as previous ... */
-                 if (input) { input.addEventListener('input', updateWithdrawButtonState); }
-            });
-            if (submitWithdrawalButton) { submitWithdrawalButton.addEventListener('click', handleWithdraw); }
-
-            // NEW: Daily Reward Listener
-            if (dailyRewardButton) {
-                dailyRewardButton.addEventListener('click', claimDailyReward);
-            }
-        }
-
-        // --- Start the App ---
-        document.addEventListener('DOMContentLoaded', initApp);
-    </script>
-</body>
-</html>
+            loadData: function() {
+                const savedData = localStorage.getItem(this.config.localStorageKey);
+                if (savedData) {
+                    const parsedData = JSON.parse(savedData);
+                    // Carefully merge, prioritize existing tasks structure if IDs match
+                    // to preserve task definitions, but update completion status
+                    const currentTaskIds = this.userData.tasks.map(t => t.id);
+                    const savedTasks = parsedData.tasks || [];
+                    
+                    this.userData = {
+                        ...this.userData, // Start with defaults (e.g. new tasks are added)
+                        ...parsedData,    // Override with saved data
+                        tasks: this.userData.tasks.map(defaultTask => { // Merge tasks
+                            const savedTask = savedTasks.find(st => st.id === defaultTask.id);
+                            return savedTask ? { ...defaultTask, completed: savedTask.completed } : defaultTask;
+                        })
+                    };
+                    // Ensure essential values are numbers
+                    this.userData.points = Number(this.userData.points) || 0;
+                    this.userData.energy = Number(this.userData.energy) || 0;
+                    this.user
