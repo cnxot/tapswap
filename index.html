@@ -1,3 +1,4 @@
+
 ```html
 <!DOCTYPE html>
 <html lang="en">
@@ -9,7 +10,7 @@
     <style>
         /*
          * Xot_swap Power Play - Main Stylesheet
-         * Version: 1.0.0
+         * Version: 1.0.1
          * Author: XotSwap Team
          * Description: Comprehensive styling for the Telegram Web App.
          */
@@ -932,7 +933,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(255, 255, 255, 0.7);
+            background-color: rgba(255, 255, 255, 0.7); /* Semi-transparent white */
             display: flex;
             justify-content: center;
             align-items: center;
@@ -948,8 +949,8 @@
         .spinner {
             width: 50px;
             height: 50px;
-            border: 5px solid var(--tg-theme-secondary-bg-color);
-            border-top-color: var(--primary-color);
+            border: 5px solid var(--tg-theme-secondary-bg-color, #f0f0f0); /* Light border */
+            border-top-color: var(--primary-color); /* Primary color for spinning part */
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
@@ -994,7 +995,7 @@
         }
 
         /* Placeholder for image if it fails to load */
-        img[alt]:after {
+        img[alt]:after { /* This provides styled alt text if image fails */
             content: attr(alt);
             display: block;
             position: absolute;
@@ -1006,7 +1007,14 @@
             color: #777;
             font-size: 12px;
             text-align: center;
-            padding-top: 40%; /* Adjust to center text vertically */
+            padding: 10px; /* Adjust padding as needed */
+            box-sizing: border-box; /* Ensure padding is included in width/height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #tap-image { /* Ensure the image itself is positioned relative for :after to work well */
+            position: relative;
         }
 
     </style>
@@ -1088,6 +1096,8 @@
             <div id="tap-button-container">
                 <div id="tap-button" ontouchstart="app.handleTap(event)" onmousedown="app.handleTap(event)">
                     <img id="tap-image" src="https://i.ibb.co/9TRgV9k/hamster-placeholder.png" alt="Tap Me Xot">
+                    <!-- If the image above doesn't load, check your browser's developer console (F12) for errors. -->
+                    <!-- It could be a network issue, ad blocker, or the image URL might be temporarily unavailable. -->
                 </div>
             </div>
 
@@ -1298,29 +1308,39 @@
 
     /**
      * Xot_swap Power Play - Main Application Logic
-     * Version: 1.0.0
+     * Version: 1.0.1
      * Author: XotSwap Team
      * Description: Core JavaScript for the Telegram Web App.
+     *
+     * For debugging:
+     * 1. Set app.config.debugMode = true; below.
+     * 2. Open your browser's developer console (usually F12).
+     * 3. Check for any error messages.
+     *
+     * If tap image is not visible:
+     * - Check console for image loading errors (404, CORS, etc.).
+     * - Ensure your network connection is stable.
+     * - Disable ad blockers or browser extensions that might interfere.
      */
 
     const app = {
         // --- Constants & Configuration ---
         config: {
             appName: "Xot_swap Power Play",
-            version: "1.0.0",
+            version: "1.0.1", // Incremented version
             defaultEnergy: 500,
-            energyPerTap: 1, // Configurable: can be upgraded
-            energyRechargeRate: 1, // Energy points per second
-            pointsPerTap: 1, // Configurable: can be upgraded
-            offlineEarningsMultiplier: 0.2, // 20% of PPH
-            maxOfflineHours: 6, // Max hours for offline earnings
+            energyPerTap: 1,
+            energyRechargeRate: 1,
+            pointsPerTap: 1,
+            offlineEarningsMultiplier: 0.2,
+            maxOfflineHours: 6,
             dailyRewardBase: 1000,
             fullEnergyBoostsDaily: 3,
             frenInviteBonus: 1000,
             frenWelcomeBonus: 500,
-            tapImage: 'https://i.ibb.co/9TRgV9k/hamster-placeholder.png', // Default tap image
+            tapImage: 'https://i.ibb.co/9TRgV9k/hamster-placeholder.png',
             localStoragePrefix: 'xotswap_powerplay_',
-            debugMode: false, // Set to true for console logs
+            debugMode: false, // << SET TO true FOR DETAILED CONSOLE LOGS >>
         },
 
         // --- Game State Variables ---
@@ -1328,18 +1348,18 @@
             currentPage: 'page-tap',
             points: 0,
             level: 1,
-            maxEnergy: 0, // Will be set by upgrades or default
+            maxEnergy: 0,
             currentEnergy: 0,
-            tapPower: 0, // Will be set by upgrades or default
+            tapPower: 0,
             profitPerHour: 0,
             lastEnergyUpdateTime: Date.now(),
             lastLoginTime: Date.now(),
             dailyRewardClaimedTime: 0,
             fullEnergyBoostsUsedToday: 0,
             fullEnergyBoostsLastReset: 0,
-            upgrades: {}, // { upgradeId: level }
-            tasksCompleted: {}, // { taskId: true }
-            frens: [], // [{id: 'xxx', name: 'Fren Name', bonusClaimed: true}]
+            upgrades: {},
+            tasksCompleted: {},
+            frens: [],
             userProfile: {
                 id: null,
                 firstName: 'Player',
@@ -1350,9 +1370,8 @@
             },
             settings: {
                 hapticsEnabled: true,
-                soundEnabled: false, // Future feature
+                soundEnabled: false,
             },
-            // Game Data - normally from a server, here hardcoded or in localStorage
             availableUpgrades: [],
             availableTasks: [],
             availableBoosts: [],
@@ -1363,28 +1382,47 @@
 
         // --- Initialization ---
         init: function() {
-            this.log("App Initializing...");
-            this.setupTelegramWebApp();
-            this.cacheDOMElements();
-            this.loadGameState(); // Load game state first
-            this.initializeGameData(); // Then initialize game definitions (upgrades, tasks)
-            this.bindEventListeners();
-            this.updateAllUI();
-            this.startEnergyRechargeCycle();
-            this.navigateToPage(this.state.currentPage, true); // Navigate to last or default page
-            this.checkDailyReward();
-            this.calculateOfflineEarnings();
-            this.checkDailyBoostReset();
-            
-            // Set dynamic viewport height
-            const setVh = () => {
-                document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
-            };
-            window.addEventListener('resize', setVh);
-            setVh(); // Initial call
+            this.log("App Initializing (v" + this.config.version + ")...");
+            // Wrap main initialization in try...finally to ensure loading overlay is hidden
+            try {
+                this.setupTelegramWebApp();
+                this.cacheDOMElements(); // Cache elements early, including loadingOverlay
+                
+                if (!this.elements.loadingOverlay) { // Critical check
+                    console.error("FATAL: Loading overlay element not found in cacheDOMElements. UI might not update correctly.");
+                }
 
-            this.log("App Initialization Complete.");
-            this.hideLoadingOverlay();
+                this.loadGameState();
+                this.initializeGameData();
+                this.bindEventListeners();
+                this.updateAllUI();
+                this.startEnergyRechargeCycle();
+                this.navigateToPage(this.state.currentPage, true);
+                this.checkDailyReward();
+                this.calculateOfflineEarnings();
+                this.checkDailyBoostReset();
+                
+                const setVh = () => {
+                    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+                };
+                window.addEventListener('resize', setVh);
+                setVh();
+
+                this.log("App Initialization logic complete.");
+
+            } catch (e) {
+                this.error("CRITICAL ERROR during app.init():", e);
+                // Optionally, display a user-friendly error message on the page
+                // For now, just log it. The loading overlay will still be hidden by 'finally'.
+                if(this.elements.appHeader) { // Try to show error on page
+                    this.elements.appHeader.innerHTML = "Error initializing. Please refresh.";
+                    this.elements.appHeader.style.backgroundColor = "red";
+                }
+            } finally {
+                this.log("Attempting to hide loading overlay (from finally block).");
+                this.hideLoadingOverlay(); // Ensure this is always called
+                this.log("App Initialization finished (or errored out).");
+            }
         },
 
         setupTelegramWebApp: function() {
@@ -1392,15 +1430,11 @@
                 if (window.Telegram && window.Telegram.WebApp) {
                     const tg = window.Telegram.WebApp;
                     tg.ready();
-                    tg.expand(); // Expand the Web App to full height
+                    tg.expand();
                     
-                    // Apply Telegram theme
-                    if (tg.themeParams) {
-                        this.applyTheme(tg.themeParams);
-                    }
+                    if (tg.themeParams) this.applyTheme(tg.themeParams);
                     tg.onEvent('themeChanged', () => this.applyTheme(tg.themeParams));
 
-                    // User data
                     if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                         const user = tg.initDataUnsafe.user;
                         this.state.userProfile.id = user.id;
@@ -1408,16 +1442,11 @@
                         this.state.userProfile.lastName = user.last_name || '';
                         this.state.userProfile.username = user.username || `user${user.id}`;
                         this.state.userProfile.photoUrl = user.photo_url || null;
-                         this.log("Telegram user data loaded:", this.state.userProfile);
+                        this.log("Telegram user data loaded:", this.state.userProfile);
                     } else {
                         this.log("Telegram user data not available. Using defaults.");
-                        // Generate a mock user ID if not in Telegram env for testing
                         this.state.userProfile.id = this.state.userProfile.id || `mock_${Date.now()}`;
                     }
-
-                    // Handle back button (optional, if you want to control navigation)
-                    // tg.BackButton.onClick(() => this.handleBackButton());
-                    // tg.BackButton.show(); // if you want to use it
                 } else {
                     this.log("Telegram WebApp script not loaded. Running in standalone mode.");
                      this.state.userProfile.id = this.state.userProfile.id || `standalone_${Date.now()}`;
@@ -1437,20 +1466,17 @@
             if (themeParams.button_color) root.style.setProperty('--tg-theme-button-color', themeParams.button_color);
             if (themeParams.button_text_color) root.style.setProperty('--tg-theme-button-text-color', themeParams.button_text_color);
             if (themeParams.secondary_bg_color) root.style.setProperty('--tg-theme-secondary-bg-color', themeParams.secondary_bg_color);
-            // Potentially update specific elements if needed, e.g. header color
         },
 
         cacheDOMElements: function() {
             this.log("Caching DOM elements...");
             this.elements = {
-                // App Structure
                 appHeader: document.getElementById('app-header'),
                 contentArea: document.querySelector('.content-area'),
                 bottomNav: document.getElementById('bottom-nav'),
                 navButtons: document.querySelectorAll('.nav-btn'),
-                loadingOverlay: document.getElementById('loading-overlay'),
+                loadingOverlay: document.getElementById('loading-overlay'), // Crucial for hiding
 
-                // Pages
                 pages: document.querySelectorAll('.page'),
                 pageTap: document.getElementById('page-tap'),
                 pageProfile: document.getElementById('page-profile'),
@@ -1460,7 +1486,6 @@
                 pageBoosts: document.getElementById('page-boosts'),
                 pageWithdraw: document.getElementById('page-withdraw'),
 
-                // Tap Page Elements
                 pointsDisplay: document.getElementById('points-display'),
                 pointsDisplayIcon: document.getElementById('points-display-icon'),
                 tapButton: document.getElementById('tap-button'),
@@ -1473,7 +1498,6 @@
                 boostFullEnergyBtn: document.getElementById('boost-full-energy-btn'),
                 fullEnergyBoostsLeftDisplay: document.getElementById('full-energy-boosts-left'),
 
-                // Profile Page Elements
                 profileNameGreeting: document.getElementById('profile-name-greeting'),
                 profileUserId: document.getElementById('profile-userId'),
                 profilePoints: document.getElementById('profile-points'),
@@ -1484,25 +1508,16 @@
                 profileAvatar: document.getElementById('profile-avatar'),
                 profileReferralLink: document.getElementById('profile-referral-link'),
 
-                // Upgrades Page Elements
                 upgradesListContainer: document.getElementById('upgrades-list-container'),
-
-                // Boosts Page Elements
                 boostsListContainer: document.getElementById('boosts-list-container'),
-                
-                // Task Page Elements
-                taskListContainer: document.getElementById('task-list'), // Assuming top level container for all tasks
                 taskCategoriesContainer: document.getElementById('task-categories'),
 
-
-                // Frens Page Elements
                 frensList: document.getElementById('frens-list'),
                 frensCountDisplay: document.getElementById('frens-count'),
                 noFrensMessage: document.getElementById('no-frens-message'),
                 frenInviteBonusDisplay: document.getElementById('fren-invite-bonus'),
                 frenWelcomeBonusDisplay: document.getElementById('fren-welcome-bonus'),
 
-                // Withdraw Page Elements
                 withdrawAmountInput: document.getElementById('withdraw-amount'),
                 withdrawMethodSelect: document.getElementById('withdraw-method'),
                 withdrawAddressInput: document.getElementById('withdraw-address'),
@@ -1511,7 +1526,6 @@
                 withdrawHistoryList: document.getElementById('withdraw-history-list'),
                 noWithdrawHistoryMessage: document.getElementById('no-withdraw-history'),
 
-                // Modals
                 dailyRewardModal: document.getElementById('daily-reward-modal'),
                 dailyRewardMessage: document.getElementById('daily-reward-message'),
                 dailyRewardAmount: document.getElementById('daily-reward-amount'),
@@ -1522,67 +1536,51 @@
                 confirmationModalMessage: document.getElementById('confirmation-modal-message'),
                 confirmationModalCancelBtn: document.getElementById('confirmation-modal-cancel-btn'),
                 confirmationModalConfirmBtn: document.getElementById('confirmation-modal-confirm-btn'),
-
-
-                // Toast Notification
+                
                 toastNotification: document.getElementById('toast-notification'),
             };
             this.log("DOM elements cached.");
+            if (!this.elements.loadingOverlay) { // Check specifically for loadingOverlay after caching
+                 this.error("Loading overlay NOT found in this.elements after caching.");
+            }
         },
 
         bindEventListeners: function() {
             this.log("Binding event listeners...");
-            // Navigation
             this.elements.navButtons.forEach(btn => {
                 btn.addEventListener('click', () => this.navigateToPage(btn.dataset.page));
             });
 
-            // Tap button - event already on element for touchstart for responsiveness
-            // this.elements.tapButton.addEventListener('click', (e) => this.handleTap(e)); // Fallback for mouse
+            if(this.elements.boostFullEnergyBtn) this.elements.boostFullEnergyBtn.addEventListener('click', () => this.activateFullEnergyBoost());
+            if(this.elements.claimDailyRewardBtn) this.elements.claimDailyRewardBtn.addEventListener('click', () => this.claimDailyReward());
+            if(this.elements.confirmationModalCancelBtn) this.elements.confirmationModalCancelBtn.addEventListener('click', () => this.hideConfirmationModal());
 
-            // Full Energy Boost
-            this.elements.boostFullEnergyBtn.addEventListener('click', () => this.activateFullEnergyBoost());
-            
-            // Daily Reward Modal
-            this.elements.claimDailyRewardBtn.addEventListener('click', () => this.claimDailyReward());
-            
-            // Confirmation Modal
-            this.elements.confirmationModalCancelBtn.addEventListener('click', () => this.hideConfirmationModal());
-
-            // Stop propagation for modals to prevent closing when clicking inside
             [this.elements.dailyRewardModal, this.elements.confirmationModal].forEach(modal => {
-                if(modal.querySelector('.modal-content')) {
+                if (modal && modal.querySelector('.modal-content')) {
                     modal.querySelector('.modal-content').addEventListener('click', e => e.stopPropagation());
+                    modal.addEventListener('click', () => {
+                        if (modal.id === 'daily-reward-modal' && this.elements.claimDailyRewardBtn && this.elements.claimDailyRewardBtn.disabled) {
+                            // No close
+                        } else if (modal.id === 'confirmation-modal') {
+                            this.hideConfirmationModal();
+                        } else {
+                             modal.classList.remove('show');
+                        }
+                    });
                 }
-                modal.addEventListener('click', () => { // Close on overlay click
-                    if (modal.id === 'daily-reward-modal' && this.elements.claimDailyRewardBtn.disabled) {
-                        // Don't close if reward already claimed and modal is just informational
-                    } else if (modal.id === 'confirmation-modal') {
-                        // Allow confirmation modal to be closed by overlay click
-                        this.hideConfirmationModal();
-                    } else {
-                         modal.classList.remove('show');
-                    }
-                });
             });
 
-
-            // Prevent double tap zoom on tap button for iOS
             if (this.elements.tapButton) {
-                this.elements.tapButton.addEventListener('touchend', function(event) {
-                    event.preventDefault(); 
-                    // We call handleTap on touchstart, so touchend is just for prevention here
-                }, { passive: false });
+                this.elements.tapButton.addEventListener('touchend', (event) => event.preventDefault(), { passive: false });
             }
 
-            // Save game state on window unload (might not always work reliably on mobile)
             window.addEventListener('beforeunload', () => this.saveGameState());
             document.addEventListener('visibilitychange', () => {
                 if (document.visibilityState === 'hidden') {
                     this.saveGameState();
                 } else if (document.visibilityState === 'visible') {
-                    this.loadGameState(); // Or just parts of it, like energy
-                    this.lastEnergyUpdateTime = Date.now(); // Reset energy update time
+                    this.loadGameState();
+                    this.lastEnergyUpdateTime = Date.now();
                     this.checkDailyReward();
                     this.checkDailyBoostReset();
                 }
@@ -1590,10 +1588,8 @@
             this.log("Event listeners bound.");
         },
         
-        // --- Game Data Initialization ---
         initializeGameData: function() {
             this.log("Initializing game data (upgrades, tasks, boosts)...");
-            // Define Upgrades
             this.state.availableUpgrades = [
                 { 
                     id: 'multitap', name: 'Multi-Tap Glove', category: 'Tap', icon: '👆',
@@ -1615,15 +1611,13 @@
                     description: 'Increases your passive profit per hour (PPH).',
                     baseCost: 1000, costMultiplier: 1.9, baseEffect: 0, effectIncrement: 100, maxLevel: 25
                 },
-                // Add more upgrades...
                 {
                     id: 'offlineBonus', name: 'Offline Bonus', category: 'Passive', icon: '💤',
                     description: 'Increases earnings while you are away.',
-                    baseCost: 5000, costMultiplier: 2.5, baseEffect: this.config.offlineEarningsMultiplier, effectIncrement: 0.05, maxLevel: 10 // 0.05 means +5%
+                    baseCost: 5000, costMultiplier: 2.5, baseEffect: this.config.offlineEarningsMultiplier, effectIncrement: 0.05, maxLevel: 10
                 }
             ];
 
-            // Define Tasks (example structure)
             this.state.availableTasks = [
                 {
                     category: 'Daily Tasks',
@@ -1648,52 +1642,41 @@
                 }
             ];
             
-            // Define Boosts (example structure)
             this.state.availableBoosts = [
                 { 
                     id: 'fullEnergy', name: 'Full Energy Refill', icon: '⛽',
                     description: `Instantly refills your energy bar. ${this.config.fullEnergyBoostsDaily} uses per day.`,
                     type: 'daily_limited', usesPerDay: this.config.fullEnergyBoostsDaily,
-                    cost: 0, // Free, but limited uses
-                    action: () => this.activateFullEnergyBoost(true), // true indicates it's from the boost page
+                    cost: 0,
+                    action: () => this.activateFullEnergyBoost(true),
                     getUsesLeft: () => this.config.fullEnergyBoostsDaily - this.state.fullEnergyBoostsUsedToday,
                     buttonText: (usesLeft) => `Refill (${usesLeft})`
                 },
                 {
                     id: 'turboTap', name: 'Turbo Tap (x3)', icon: '🚀',
                     description: 'Triples your tap power for 30 seconds. 1 use per day.',
-                    type: 'daily_timed', duration: 30000, // 30 seconds
-                    cost: 0, // Or could cost points
+                    type: 'daily_timed', duration: 30000,
+                    cost: 0,
                     usesPerDay: 1,
                     action: () => this.activateTurboTapBoost(),
                     getUsesLeft: () => 1 - (this.state.activeBoosts && this.state.activeBoosts.turboTap && this.state.activeBoosts.turboTap.usedToday ? 1:0),
                     buttonText: (usesLeft) => usesLeft > 0 ? 'Activate' : 'Used'
                 },
-                // Add more boosts...
             ];
             
-            // Initialize default levels for upgrades if not in state
             this.state.availableUpgrades.forEach(upg => {
                 if (this.state.upgrades[upg.id] === undefined) {
-                    this.state.upgrades[upg.id] = 0; // Level 0 for unpurchased upgrades
+                    this.state.upgrades[upg.id] = 0;
                 }
             });
 
-            // Set initial derived stats based on upgrades
             this.updateDerivedStats();
             this.log("Game data initialized.");
         },
 
-        // --- Game Logic ---
         handleTap: function(event) {
-            // Prevent default for touch events to avoid issues like double tap zoom or unwanted scrolling
-            if (event.type === 'touchstart') {
-                event.preventDefault();
-            }
-            // For mouse clicks, ensure it's the primary button (left click)
-            if (event.type === 'mousedown' && event.button !== 0) {
-                return;
-            }
+            if (event.type === 'touchstart') event.preventDefault();
+            if (event.type === 'mousedown' && event.button !== 0) return;
             
             if (this.state.currentEnergy >= this.config.energyPerTap) {
                 this.state.currentEnergy -= this.config.energyPerTap;
@@ -1706,10 +1689,7 @@
                 if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
                     window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
                 }
-                
-                // Track daily taps for tasks
                 this.incrementDailyCounter('dailyTaps');
-
             } else {
                 this.showToast("Not enough energy!", "error");
                  if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
@@ -1719,49 +1699,38 @@
         },
         
         animateTapScore: function(score, event) {
+            if (!this.elements.tapButtonContainer) return;
             const scoreText = document.createElement('div');
             scoreText.className = 'tap-score-animation';
             scoreText.textContent = `+${this.formatNumber(score)}`;
-            
             this.elements.tapButtonContainer.appendChild(scoreText);
 
-            // Position based on tap location
             const rect = this.elements.tapButtonContainer.getBoundingClientRect();
             let clientX, clientY;
-
             if (event.touches && event.touches.length > 0) {
-                clientX = event.touches[0].clientX;
-                clientY = event.touches[0].clientY;
+                clientX = event.touches[0].clientX; clientY = event.touches[0].clientY;
             } else {
-                clientX = event.clientX;
-                clientY = event.clientY;
+                clientX = event.clientX; clientY = event.clientY;
             }
-            
             const x = clientX - rect.left - (scoreText.offsetWidth / 2);
-            const y = clientY - rect.top - (scoreText.offsetHeight / 2) - 20; // Start slightly above tap point
-
-            scoreText.style.left = `${x + (Math.random() * 40 - 20)}px`; // Add some randomness
+            const y = clientY - rect.top - (scoreText.offsetHeight / 2) - 20;
+            scoreText.style.left = `${x + (Math.random() * 40 - 20)}px`;
             scoreText.style.top = `${y + (Math.random() * 20 - 10)}px`;
-
-            setTimeout(() => {
-                scoreText.remove();
-            }, 1150); // Animation duration is 1.2s
+            setTimeout(() => scoreText.remove(), 1150);
         },
 
         startEnergyRechargeCycle: function() {
             setInterval(() => {
                 const now = Date.now();
                 const elapsedSeconds = Math.floor((now - this.state.lastEnergyUpdateTime) / 1000);
-
                 if (elapsedSeconds > 0 && this.state.currentEnergy < this.state.maxEnergy) {
                     const energyToRecharge = elapsedSeconds * this.getUpgradeEffect('energyRecharge', this.config.energyRechargeRate);
                     this.state.currentEnergy = Math.min(this.state.maxEnergy, this.state.currentEnergy + energyToRecharge);
                     this.updateEnergyDisplay();
                 }
                 this.state.lastEnergyUpdateTime = now;
-                // Also save game state periodically
-                 this.saveGameState(); 
-            }, 1000); // Check every second
+                this.saveGameState(); 
+            }, 1000);
         },
         
         activateFullEnergyBoost: function(fromBoostPage = false) {
@@ -1774,7 +1743,6 @@
                 if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
                     window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                 }
-                // If called from boosts page, re-render boosts
                 if (fromBoostPage) this.renderBoostsPage();
             } else {
                 this.showToast("No energy refills left today.", "error");
@@ -1782,44 +1750,34 @@
         },
 
         calculateProfitPerHour: function() {
-            // PPH is primarily from 'profitPerHourPassive' upgrade
-            const basePPH = this.getUpgradeEffect('profitPerHourPassive', 0);
-            // Could add other factors here, e.g., frens bonus, league bonus etc.
-            this.state.profitPerHour = basePPH;
+            this.state.profitPerHour = this.getUpgradeEffect('profitPerHourPassive', 0);
             return this.state.profitPerHour;
         },
 
         calculateOfflineEarnings: function() {
             const now = Date.now();
             const timeOfflineMs = now - this.state.lastLoginTime;
-            const maxOfflineMs = this.config.maxOfflineHours * 60 * 60 * 1000;
+            const maxOfflineMs = this.config.maxOfflineHours * 3600000;
             const effectiveOfflineMs = Math.min(timeOfflineMs, maxOfflineMs);
             
-            if (effectiveOfflineMs <= 60000) { // Less than a minute, don't bother
-                this.state.lastLoginTime = now;
-                this.saveGameState();
-                return;
+            if (effectiveOfflineMs <= 60000) {
+                this.state.lastLoginTime = now; this.saveGameState(); return;
             }
-
-            const hoursOffline = effectiveOfflineMs / (1000 * 60 * 60);
-            const pph = this.state.profitPerHour > 0 ? this.state.profitPerHour : 10; // Minimum PPH for calculation if 0
+            const hoursOffline = effectiveOfflineMs / 3600000;
+            const pph = this.state.profitPerHour > 0 ? this.state.profitPerHour : 10;
             const offlineMultiplier = this.getUpgradeEffect('offlineBonus', this.config.offlineEarningsMultiplier);
-            
             const earnings = Math.floor(pph * hoursOffline * offlineMultiplier);
 
             if (earnings > 0) {
-                this.state.points += earnings;
-                this.updatePointsDisplay();
+                this.state.points += earnings; this.updatePointsDisplay();
                 this.showToast(`Welcome back! You earned ${this.formatNumber(earnings)} points while away.`, "info", 5000);
             }
-            this.state.lastLoginTime = now; // Update last login time
-            this.saveGameState();
+            this.state.lastLoginTime = now; this.saveGameState();
         },
 
-        // --- Upgrades Logic ---
         getUpgradeCost: function(upgrade) {
             const level = this.state.upgrades[upgrade.id] || 0;
-            if (level >= upgrade.maxLevel) return Infinity; // Max level reached
+            if (level >= upgrade.maxLevel) return Infinity;
             return Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, level));
         },
 
@@ -1827,198 +1785,122 @@
             const upgrade = this.state.availableUpgrades.find(u => u.id === upgradeId);
             if (!upgrade) return defaultValueIfNotFound;
             const level = this.state.upgrades[upgradeId] || 0;
-            if (level === 0 && upgrade.id !== 'multitap' && upgrade.id !== 'energyRecharge') { // For some, level 0 means base value
-                 // For multitap and energyRecharge, level 0 should use config default
-                 if(upgrade.id === 'multitap') return this.config.pointsPerTap;
-                 if(upgrade.id === 'energyRecharge') return this.config.energyRechargeRate;
-                 // For others, if baseEffect is not 0, it means it's the starting value
-                 if(upgrade.baseEffect !== 0 && upgrade.id === 'energyLimit') return this.config.defaultEnergy; // Special for energyLimit
-                 return upgrade.baseEffect; // Usually 0 for PPH like upgrades if unbought
-            }
-            // For energyLimit, baseEffect is the initial default energy. effectIncrement adds to this.
-            // For multitap, baseEffect is 1, increment is 1. Level 0 means 1 tap.
             let effect = upgrade.baseEffect;
-            if (level > 0) {
-                 effect = upgrade.baseEffect + (upgrade.effectIncrement * level);
-            }
-             // Special handling for energyLimit, which should start at defaultEnergy
-            if (upgrade.id === 'energyLimit' && level === 0) {
-                effect = this.config.defaultEnergy;
-            } else if (upgrade.id === 'energyLimit' && level > 0) {
-                effect = this.config.defaultEnergy + (upgrade.effectIncrement * level);
-            }
 
-            // For multitap, if level 0, it's config.pointsPerTap. If level > 0, it's config.pointsPerTap + increments
-            if(upgrade.id === 'multitap') {
+            if (upgrade.id === 'multitap') {
                 effect = this.config.pointsPerTap + (upgrade.effectIncrement * level);
+            } else if (upgrade.id === 'energyLimit') {
+                effect = this.config.defaultEnergy + (upgrade.effectIncrement * level);
+            } else if (upgrade.id === 'energyRecharge') {
+                 effect = this.config.energyRechargeRate + (upgrade.effectIncrement * level);
+            } else if (level > 0) { // For PPH and OfflineBonus, effect starts from increment * level
+                 effect = upgrade.effectIncrement * level;
+                 if(upgrade.id === 'offlineBonus') effect = this.config.offlineEarningsMultiplier + (upgrade.effectIncrement * level); // Offline Bonus starts from config
+            } else if(upgrade.id === 'offlineBonus' && level === 0){ // Base offline bonus if not upgraded
+                effect = this.config.offlineEarningsMultiplier;
+            } else if(level === 0){ // for PPH, if level 0, effect is baseEffect (which is 0)
+                effect = upgrade.baseEffect;
             }
-            if(upgrade.id === 'energyRecharge') {
-                effect = this.config.energyRechargeRate + (upgrade.effectIncrement * level);
-            }
-
             return effect;
         },
 
         buyUpgrade: function(upgradeId) {
             const upgrade = this.state.availableUpgrades.find(u => u.id === upgradeId);
-            if (!upgrade) {
-                this.showToast("Upgrade not found!", "error");
-                return;
-            }
-
+            if (!upgrade) { this.showToast("Upgrade not found!", "error"); return; }
             const cost = this.getUpgradeCost(upgrade);
             const currentLevel = this.state.upgrades[upgradeId] || 0;
 
-            if (currentLevel >= upgrade.maxLevel) {
-                this.showToast("Max level reached for this upgrade!", "info");
-                return;
-            }
-
+            if (currentLevel >= upgrade.maxLevel) { this.showToast("Max level reached!", "info"); return; }
             if (this.state.points >= cost) {
-                this.state.points -= cost;
-                this.state.upgrades[upgradeId]++;
-                
-                this.updateDerivedStats(); // Recalculate stats like tapPower, maxEnergy
-                this.updateAllUI(); // Update points, PPH, upgrade list, etc.
-                this.renderUpgradesPage(); // Re-render to show new level and cost
-                
-                this.showToast(`${upgrade.name} upgraded to Level ${this.state.upgrades[upgradeId]}!`, "success");
-                if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
-                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
-                }
+                this.state.points -= cost; this.state.upgrades[upgradeId]++;
+                this.updateDerivedStats(); this.updateAllUI(); this.renderUpgradesPage();
+                this.showToast(`${upgrade.name} upgraded to Lvl ${this.state.upgrades[upgradeId]}!`, "success");
+                if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
                 this.saveGameState();
             } else {
                 this.showToast("Not enough points!", "error");
-                 if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
-                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
-                }
+                if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
             }
         },
         
         updateDerivedStats: function() {
-            this.state.tapPower = this.getUpgradeEffect('multitap', this.config.pointsPerTap);
-            this.state.maxEnergy = this.getUpgradeEffect('energyLimit', this.config.defaultEnergy);
-            // Ensure currentEnergy doesn't exceed new maxEnergy
+            this.state.tapPower = this.getUpgradeEffect('multitap');
+            this.state.maxEnergy = this.getUpgradeEffect('energyLimit');
             this.state.currentEnergy = Math.min(this.state.currentEnergy, this.state.maxEnergy);
-            
-            this.calculateProfitPerHour(); // Recalculates and sets this.state.profitPerHour
-            // Update player level (example logic)
+            this.calculateProfitPerHour();
             this.updatePlayerLevel();
         },
         
         updatePlayerLevel: function() {
-            // Example: Level up based on total points or PPH
-            // This is a simple placeholder logic
             const pph = this.state.profitPerHour;
-            if (pph >= 10000) this.state.level = 5;
-            else if (pph >= 5000) this.state.level = 4;
-            else if (pph >= 1000) this.state.level = 3;
-            else if (pph >= 100) this.state.level = 2;
+            if (pph >= 10000) this.state.level = 5; else if (pph >= 5000) this.state.level = 4;
+            else if (pph >= 1000) this.state.level = 3; else if (pph >= 100) this.state.level = 2;
             else this.state.level = 1;
         },
 
-        // --- Tasks Logic ---
         completeTask: function(taskId) {
             const task = this.findTaskById(taskId);
             if (!task || this.state.tasksCompleted[taskId]) return;
 
-            // For external tasks, we might just mark complete and give reward
-            // For game_event tasks, they should be marked by the event itself
-            if (task.type === 'external' || task.type === 'daily' || (task.type === 'daily_counter' && task.checkCompletion())) {
-                this.state.points += task.reward;
-                this.state.tasksCompleted[taskId] = true; // Mark as completed
+            if (task.type === 'external' || task.type === 'daily' || (task.type === 'daily_counter' && task.checkCompletion && task.checkCompletion())) {
+                this.state.points += task.reward; this.state.tasksCompleted[taskId] = true;
                 if (task.type === 'daily') this.markDailyTaskCompleted(taskId);
-
-                this.updatePointsDisplay();
-                this.renderTasksPage(); // Re-render tasks
-                this.showToast(`Task "${task.name}" completed! +${this.formatNumber(task.reward)} points.`, "success");
+                this.updatePointsDisplay(); this.renderTasksPage();
+                this.showToast(`Task "${task.name}" complete! +${this.formatNumber(task.reward)}`, "success");
                 this.saveGameState();
             } else if (task.link) {
-                 if (window.Telegram && window.Telegram.WebApp) {
-                    window.Telegram.WebApp.openLink(task.link);
-                 } else {
-                    window.open(task.link, '_blank');
-                 }
-                 // For external link tasks, user needs to come back and claim, or we use a delay
-                 // For simplicity, let's assume some tasks auto-verify after a short delay (mocked)
-                 // Or, add a "Check" button. For now, we'll assume they are trusted to complete.
-                 // Consider adding a "Claim" button after they click "Join/Follow"
+                 if (window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openLink(task.link);
+                 else window.open(task.link, '_blank');
             }
         },
 
         findTaskById: function(taskId) {
             for (const category of this.state.availableTasks) {
-                const task = category.tasks.find(t => t.id === taskId);
-                if (task) return task;
-            }
-            return null;
+                const task = category.tasks.find(t => t.id === taskId); if (task) return task;
+            } return null;
         },
-
         isDailyTaskCompleted: function(taskId) {
             const today = new Date().toISOString().split('T')[0];
             return this.state.tasksCompleted[`${taskId}_${today}`] === true;
         },
-
         markDailyTaskCompleted: function(taskId) {
             const today = new Date().toISOString().split('T')[0];
             this.state.tasksCompleted[`${taskId}_${today}`] = true;
         },
-
         getDailyCounter: function(counterKey) {
             const today = new Date().toISOString().split('T')[0];
             return this.state.tasksCompleted[`${counterKey}_${today}_count`] || 0;
         },
-
         incrementDailyCounter: function(counterKey, amount = 1) {
             const today = new Date().toISOString().split('T')[0];
             const key = `${counterKey}_${today}_count`;
             this.state.tasksCompleted[key] = (this.state.tasksCompleted[key] || 0) + amount;
-            // Check if any tasks are completed by this increment
-            this.checkCounterTaskCompletions(counterKey);
-            this.saveGameState(); // Save frequently for counters
+            this.checkCounterTaskCompletions(counterKey); this.saveGameState();
         },
-        
         checkCounterTaskCompletions: function(counterKey) {
-            this.state.availableTasks.forEach(category => {
-                category.tasks.forEach(task => {
-                    if (task.type === 'daily_counter' && task.counterKey === counterKey && !this.isTaskActuallyCompleted(task.id)) {
-                        if (task.checkCompletion && task.checkCompletion()) {
-                           // This task is now complete, but don't auto-claim here. UI should reflect it.
-                           // Re-render tasks page to show updatable claim button.
-                           if (this.state.currentPage === 'page-task') {
-                               this.renderTasksPage();
-                           }
-                        }
+            this.state.availableTasks.forEach(cat => cat.tasks.forEach(task => {
+                if (task.type === 'daily_counter' && task.counterKey === counterKey && !this.isTaskActuallyCompleted(task.id)) {
+                    if (task.checkCompletion && task.checkCompletion() && this.state.currentPage === 'page-task') {
+                        this.renderTasksPage();
                     }
-                });
-            });
+                }
+            }));
         },
-
         isTaskActuallyCompleted: function(taskId) {
-            // This checks the general completion, not daily instance
-            const task = this.findTaskById(taskId);
-            if (!task) return false;
-
-            if (task.type === 'daily' || task.type === 'daily_counter') {
-                return this.isDailyTaskCompleted(taskId);
-            }
+            const task = this.findTaskById(taskId); if (!task) return false;
+            if (task.type === 'daily' || task.type === 'daily_counter') return this.isDailyTaskCompleted(taskId);
             return this.state.tasksCompleted[taskId] === true;
         },
         
-        // --- Boosts Logic ---
         checkDailyBoostReset: function() {
             const today = new Date().toISOString().split('T')[0];
-            const lastResetDate = this.state.fullEnergyBoostsLastReset ? new Date(this.state.fullEnergyBoostsLastReset).toISOString().split('T')[0] : null;
-
-            if (today !== lastResetDate) {
+            const lastReset = this.state.fullEnergyBoostsLastReset ? new Date(this.state.fullEnergyBoostsLastReset).toISOString().split('T')[0] : null;
+            if (today !== lastReset) {
                 this.state.fullEnergyBoostsUsedToday = 0;
-                this.state.fullEnergyBoostsLastReset = new Date().getTime();
-                // Reset other daily boosts usage counts here
-                if(this.state.activeBoosts && this.state.activeBoosts.turboTap) {
-                    this.state.activeBoosts.turboTap.usedToday = false;
-                }
+                this.state.fullEnergyBoostsLastReset = Date.now();
+                if(this.state.activeBoosts && this.state.activeBoosts.turboTap) this.state.activeBoosts.turboTap.usedToday = false;
                 this.log("Daily boosts reset.");
-                this.updateFullEnergyBoostButton(); // Update UI for full energy on tap page
+                this.updateFullEnergyBoostButton();
                 if(this.state.currentPage === 'page-boosts') this.renderBoostsPage();
                 this.saveGameState();
             }
@@ -2026,911 +1908,428 @@
         
         activateTurboTapBoost: function() {
             if (!this.state.activeBoosts) this.state.activeBoosts = {};
-            if (!this.state.activeBoosts.turboTap) this.state.activeBoosts.turboTap = { active: false, endTime: 0, usedToday: false, originalTapPower: 0 };
-
+            if (!this.state.activeBoosts.turboTap) this.state.activeBoosts.turboTap = { active: false, endTime: 0, usedToday: false, originalTapPower: 0, usesCountToday: 0 };
             const boostState = this.state.activeBoosts.turboTap;
             const boostDef = this.state.availableBoosts.find(b => b.id === 'turboTap');
+            if (boostState.active) { this.showToast("Turbo Tap active!", "info"); return; }
+            if (boostState.usedToday && boostDef.usesPerDay <= boostState.usesCountToday) { this.showToast("Turbo Tap used today.", "info"); return; }
 
-            if (boostState.active) {
-                this.showToast("Turbo Tap is already active!", "info");
-                return;
-            }
-            if (boostState.usedToday && boostDef.usesPerDay <= (this.state.activeBoosts.turboTap.usesCountToday || 0) ) {
-                 this.showToast("Turbo Tap already used today.", "info");
-                 return;
-            }
-
-            boostState.originalTapPower = this.state.tapPower;
-            this.state.tapPower *= 3; // Triple tap power
-            boostState.active = true;
-            boostState.endTime = Date.now() + boostDef.duration;
-            boostState.usedToday = true; // Mark as used for the day
-            boostState.usesCountToday = (boostState.usesCountToday || 0) + 1;
-
-
-            this.showToast("Turbo Tap Activated! Tap power x3 for 30s.", "success", 3000);
-            this.updateTapPowerDisplay(); // if there's a specific display for tap power on profile/tap page
-            this.renderBoostsPage(); // Re-render boosts to show active state / timer
-
-            // Timer to deactivate
+            boostState.originalTapPower = this.state.tapPower; this.state.tapPower *= 3;
+            boostState.active = true; boostState.endTime = Date.now() + boostDef.duration;
+            boostState.usedToday = true; boostState.usesCountToday++;
+            this.showToast("Turbo Tap! Power x3 for 30s.", "success", 3000);
+            this.updateTapPowerDisplay(); this.renderBoostsPage();
             setTimeout(() => {
-                this.state.tapPower = boostState.originalTapPower;
-                boostState.active = false;
+                this.state.tapPower = boostState.originalTapPower; boostState.active = false;
                 this.showToast("Turbo Tap ended.", "info");
-                this.updateTapPowerDisplay();
-                this.renderBoostsPage();
-                this.saveGameState();
+                this.updateTapPowerDisplay(); this.renderBoostsPage(); this.saveGameState();
             }, boostDef.duration);
             this.saveGameState();
         },
 
-
-        // --- Daily Reward Logic ---
         checkDailyReward: function() {
-            const now = new Date();
-            const today = now.toISOString().split('T')[0];
-            const lastClaimDate = this.state.dailyRewardClaimedTime ? new Date(this.state.dailyRewardClaimedTime).toISOString().split('T')[0] : null;
-
-            if (today !== lastClaimDate) {
-                this.elements.dailyRewardAmount.textContent = this.formatNumber(this.config.dailyRewardBase);
-                this.elements.claimDailyRewardBtn.disabled = false;
-                this.elements.dailyRewardModal.classList.add('show');
-            } else {
-                // Optional: Show message if already claimed
-                // this.elements.dailyRewardMessage.textContent = "You've already claimed your daily reward. Come back tomorrow!";
-                // this.elements.claimDailyRewardBtn.disabled = true;
-                // this.elements.dailyRewardModal.classList.add('show'); // Or just don't show it
+            const now = new Date(); const today = now.toISOString().split('T')[0];
+            const lastClaim = this.state.dailyRewardClaimedTime ? new Date(this.state.dailyRewardClaimedTime).toISOString().split('T')[0] : null;
+            if (today !== lastClaim) {
+                if(this.elements.dailyRewardAmount) this.elements.dailyRewardAmount.textContent = this.formatNumber(this.config.dailyRewardBase);
+                if(this.elements.claimDailyRewardBtn) this.elements.claimDailyRewardBtn.disabled = false;
+                if(this.elements.dailyRewardModal) this.elements.dailyRewardModal.classList.add('show');
             }
         },
-
         claimDailyReward: function() {
-            this.state.points += this.config.dailyRewardBase;
-            this.state.dailyRewardClaimedTime = Date.now();
+            this.state.points += this.config.dailyRewardBase; this.state.dailyRewardClaimedTime = Date.now();
             this.updatePointsDisplay();
-            this.elements.dailyRewardMessage.textContent = `Awesome! ${this.formatNumber(this.config.dailyRewardBase)} points added.`;
-            this.elements.claimDailyRewardBtn.textContent = "Claimed!";
-            this.elements.claimDailyRewardBtn.disabled = true;
-            this.showToast(`+${this.formatNumber(this.config.dailyRewardBase)} points from daily reward!`, "success");
+            if(this.elements.dailyRewardMessage) this.elements.dailyRewardMessage.textContent = `Awesome! ${this.formatNumber(this.config.dailyRewardBase)} points added.`;
+            if(this.elements.claimDailyRewardBtn) { this.elements.claimDailyRewardBtn.textContent = "Claimed!"; this.elements.claimDailyRewardBtn.disabled = true; }
+            this.showToast(`+${this.formatNumber(this.config.dailyRewardBase)} daily reward!`, "success");
             this.saveGameState();
-            // Optional: Auto-close modal after a delay
-            setTimeout(() => this.elements.dailyRewardModal.classList.remove('show'), 2000);
+            if(this.elements.dailyRewardModal) setTimeout(() => this.elements.dailyRewardModal.classList.remove('show'), 2000);
         },
 
-        // --- Frens Logic ---
         inviteFren: function() {
-            const referralId = this.state.userProfile.id || 'testuser';
-            // Construct referral link (this depends on how your bot handles deep linking)
-            // Example: t.me/your_bot_name?start=ref_USERID
-            const botUsername = "xotswap_bot"; // Replace with your actual bot username
-            const referralLink = `https://t.me/${botUsername}?start=ref_${referralId}`;
-            
-            const text = `Join me in Xot_swap Power Play and get ${this.formatNumber(this.config.frenWelcomeBonus)} bonus points! ${referralLink}`;
-
+            const refId = this.state.userProfile.id || 'testuser'; const botName = "xotswap_bot";
+            const refLink = `https://t.me/${botName}?start=ref_${refId}`;
+            const text = `Join Xot_swap & get ${this.formatNumber(this.config.frenWelcomeBonus)} bonus! ${refLink}`;
             if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
-                 // Share via Telegram's native share dialog
-                 window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(`Join me in Xot_swap Power Play and get ${this.formatNumber(this.config.frenWelcomeBonus)} bonus points!`)}`);
-            } else {
-                // Fallback for non-Telegram environments (copy to clipboard)
-                this.copyToClipboard(referralLink, "Referral link copied! Share it with your frens.");
-            }
+                 window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(refLink)}&text=${encodeURIComponent(`Join Xot_swap & get ${this.formatNumber(this.config.frenWelcomeBonus)} bonus!`)}`);
+            } else { this.copyToClipboard(refLink, "Referral link copied!"); }
         },
-        
-        // Called when a new user joins via referral link (simulated for now)
         processReferral: function(referrerId) {
-            // This would ideally be triggered by backend/bot logic when a new user joins
-            this.log(`Processing referral from ${referrerId}`);
-            // Give welcome bonus to new user
-            this.state.points += this.config.frenWelcomeBonus;
-            this.showToast(`Welcome! You received ${this.formatNumber(this.config.frenWelcomeBonus)} points from your fren!`, "success", 4000);
-            
-            // TODO: Send message to referrer (server-side or via bot API) that their fren joined
-            // For client-side demo, we can't directly add to another user's frens list or give them points.
-            // This part would need server interaction.
+            this.log(`Referral from ${referrerId}`); this.state.points += this.config.frenWelcomeBonus;
+            this.showToast(`Welcome! +${this.formatNumber(this.config.frenWelcomeBonus)} from your fren!`, "success", 4000);
             this.saveGameState();
         },
-        
-        // Simulate adding a fren for demo purposes
-        addSimulatedFren: function() {
-            const newFrenId = `fren_${Date.now()}`;
-            const newFren = {
-                id: newFrenId,
-                name: `Fren ${this.state.frens.length + 1}`,
-                photoUrl: null, // Placeholder
-                pointsEarnedForMe: 0, // Future use
-                joinDate: new Date().toISOString()
-            };
-            this.state.frens.push(newFren);
-            
-            // Give bonus to current user for inviting
-            this.state.points += this.config.frenInviteBonus;
-            this.showToast(`Your fren ${newFren.name} joined! +${this.formatNumber(this.config.frenInviteBonus)} points.`, "success");
-            
-            this.updatePointsDisplay();
-            this.renderFrensPage();
-            this.saveGameState();
+        addSimulatedFren: function() { /* For debug */
+            const newFren = { id: `fren_${Date.now()}`, name: `Fren ${this.state.frens.length + 1}`, joinDate: new Date().toISOString(), pointsEarnedForMe: 0 };
+            this.state.frens.push(newFren); this.state.points += this.config.frenInviteBonus;
+            this.showToast(`${newFren.name} joined! +${this.formatNumber(this.config.frenInviteBonus)}`, "success");
+            this.updatePointsDisplay(); this.renderFrensPage(); this.saveGameState();
             this.markTaskAsCompletedByEvent('frenInvited');
         },
-        
         markTaskAsCompletedByEvent: function(eventKey) {
-            this.state.availableTasks.forEach(category => {
-                category.tasks.forEach(task => {
-                    if (task.type === 'game_event' && task.eventKey === eventKey && !this.isTaskActuallyCompleted(task.id)) {
-                        this.completeTask(task.id); // This will handle reward and marking complete
-                    }
-                });
-            });
+            this.state.availableTasks.forEach(cat => cat.tasks.forEach(task => {
+                if (task.type === 'game_event' && task.eventKey === eventKey && !this.isTaskActuallyCompleted(task.id)) {
+                    this.completeTask(task.id);
+                }
+            }));
         },
 
-
-        // --- Withdraw Logic (Conceptual) ---
         handleWithdrawRequest: function() {
             const amount = parseInt(this.elements.withdrawAmountInput.value);
             const method = this.elements.withdrawMethodSelect.value;
             const address = this.elements.withdrawAddressInput.value;
+            this.elements.withdrawMessage.textContent = ""; this.elements.withdrawMessage.className = "mt-2";
 
-            this.elements.withdrawMessage.textContent = "";
-            this.elements.withdrawMessage.className = "mt-2";
-
-
-            if (isNaN(amount) || amount <= 0) {
-                this.setWithdrawMessage("Please enter a valid amount.", "error");
-                return;
-            }
-            if (amount > this.state.points) {
-                this.setWithdrawMessage("Insufficient points for withdrawal.", "error");
-                return;
-            }
-            if (method === "ton_usdt" && !address) {
-                 this.setWithdrawMessage("Please enter your TON wallet address.", "error");
-                return;
-            }
-            // Basic TON address validation (very simple, improve for production)
+            if (isNaN(amount) || amount <= 0) { this.setWithdrawMessage("Enter valid amount.", "error"); return; }
+            if (amount > this.state.points) { this.setWithdrawMessage("Insufficient points.", "error"); return; }
+            if (method === "ton_usdt" && !address) { this.setWithdrawMessage("Enter TON wallet address.", "error"); return; }
             if (method === "ton_usdt" && (address.length < 40 || !address.startsWith("UQ") && !address.startsWith("EQ"))) {
-                this.setWithdrawMessage("Invalid TON wallet address format.", "error");
-                return;
+                this.setWithdrawMessage("Invalid TON address.", "error"); return;
             }
-
-            // Simulate request
-            this.showLoadingOverlay();
-            this.setWithdrawMessage("Processing your withdrawal request...", "info");
-
+            this.showLoadingOverlay(); this.setWithdrawMessage("Processing request...", "info");
             setTimeout(() => {
-                this.hideLoadingOverlay();
-                // This is where you'd interact with a backend API
-                // For now, simulate success or failure
-                const success = Math.random() > 0.1; // 90% success rate for demo
-
+                this.hideLoadingOverlay(); const success = Math.random() > 0.1;
                 if (success) {
-                    this.state.points -= amount;
-                    this.updatePointsDisplay();
-                    this.updateProfilePage(); // Update points on profile page too
-                    this.setWithdrawMessage(`Withdrawal request for ${this.formatNumber(amount)} points submitted successfully! It will be processed soon.`, "success");
-                    // Add to mock history
-                    const historyEntry = {
-                        id: `wd_${Date.now()}`,
-                        amount: amount,
-                        method: method,
-                        address: address,
-                        status: 'Pending', // Or 'Processing'
-                        date: new Date().toISOString()
-                    };
-                    // Prepend to history
+                    this.state.points -= amount; this.updatePointsDisplay(); this.updateProfilePage();
+                    this.setWithdrawMessage(`Withdrawal of ${this.formatNumber(amount)} submitted!`, "success");
+                    const entry = { id: `wd_${Date.now()}`, amount, method, address, status: 'Pending', date: new Date().toISOString() };
                     if (!this.state.withdrawHistory) this.state.withdrawHistory = [];
-                    this.state.withdrawHistory.unshift(historyEntry);
-                    this.renderWithdrawHistory();
-                    this.elements.withdrawAmountInput.value = "";
-                    this.elements.withdrawAddressInput.value = "";
+                    this.state.withdrawHistory.unshift(entry); this.renderWithdrawHistory();
+                    this.elements.withdrawAmountInput.value = ""; this.elements.withdrawAddressInput.value = "";
                     this.saveGameState();
-                } else {
-                    this.setWithdrawMessage("Withdrawal request failed. Please try again later or contact support.", "error");
-                }
-            }, 2000); // Simulate network delay
+                } else { this.setWithdrawMessage("Withdrawal failed. Try again later.", "error"); }
+            }, 2000);
         },
-        
         setWithdrawMessage: function(message, type) {
-            this.elements.withdrawMessage.textContent = message;
-            this.elements.withdrawMessage.className = `mt-2 ${type}`; // type is 'success', 'error', or 'info'
+            if(this.elements.withdrawMessage) {
+                 this.elements.withdrawMessage.textContent = message;
+                 this.elements.withdrawMessage.className = `mt-2 ${type}`;
+            }
         },
 
-
-        // --- UI Rendering and Updates ---
         updateAllUI: function() {
             this.log("Updating all UI components...");
-            this.updatePointsDisplay();
-            this.updateEnergyDisplay();
-            this.updatePPHDisplay();
-            this.updateLevelDisplay();
-            this.updateProfilePage();
-            this.updateTapPowerDisplay(); // For profile page
-            this.updateMaxEnergyDisplay(); // For profile page
-            this.updateFullEnergyBoostButton();
-            
-            // Potentially re-render dynamic lists if needed, or rely on specific page renders
+            this.updatePointsDisplay(); this.updateEnergyDisplay(); this.updatePPHDisplay();
+            this.updateLevelDisplay(); this.updateProfilePage(); this.updateTapPowerDisplay();
+            this.updateMaxEnergyDisplay(); this.updateFullEnergyBoostButton();
             if (this.elements[this.state.currentPage]) {
                  switch(this.state.currentPage) {
                     case 'page-upgrades': this.renderUpgradesPage(); break;
                     case 'page-task': this.renderTasksPage(); break;
                     case 'page-frens': this.renderFrensPage(); break;
                     case 'page-boosts': this.renderBoostsPage(); break;
-                    // Tap and Profile are updated by individual functions above
                  }
             }
-            this.log("All UI components updated.");
         },
-
         updatePointsDisplay: function() {
-            if (this.elements.pointsDisplay) {
-                this.elements.pointsDisplay.textContent = this.formatNumber(this.state.points);
-            }
-            if (this.elements.profilePoints) { // Also update on profile page if visible
-                this.elements.profilePoints.textContent = this.formatNumber(this.state.points);
-            }
+            if (this.elements.pointsDisplay) this.elements.pointsDisplay.textContent = this.formatNumber(this.state.points);
+            if (this.elements.profilePoints) this.elements.profilePoints.textContent = this.formatNumber(this.state.points);
         },
-
         updateEnergyDisplay: function() {
             if (this.elements.energyText && this.elements.energyBarFill) {
                 this.elements.energyText.textContent = `${this.formatNumber(Math.floor(this.state.currentEnergy))}/${this.formatNumber(this.state.maxEnergy)}`;
-                const energyPercentage = (this.state.currentEnergy / this.state.maxEnergy) * 100;
-                this.elements.energyBarFill.style.width = `${Math.max(0, Math.min(100, energyPercentage))}%`;
+                const perc = (this.state.maxEnergy > 0 ? (this.state.currentEnergy / this.state.maxEnergy) : 0) * 100;
+                this.elements.energyBarFill.style.width = `${Math.max(0, Math.min(100, perc))}%`;
             }
         },
-
         updatePPHDisplay: function() {
             const pph = this.state.profitPerHour;
-            if (this.elements.profitPerHourDisplay) {
-                this.elements.profitPerHourDisplay.textContent = `PPH: ${this.formatNumber(pph)}`;
-            }
-            if (this.elements.profilePph) {
-                this.elements.profilePph.textContent = this.formatNumber(pph);
-            }
+            if (this.elements.profitPerHourDisplay) this.elements.profitPerHourDisplay.textContent = `PPH: ${this.formatNumber(pph)}`;
+            if (this.elements.profilePph) this.elements.profilePph.textContent = this.formatNumber(pph);
         },
-        
         updateLevelDisplay: function() {
-            if (this.elements.levelDisplay) {
-                this.elements.levelDisplay.textContent = `Level: ${this.state.level}`;
-            }
+            if (this.elements.levelDisplay) this.elements.levelDisplay.textContent = `Level: ${this.state.level}`;
         },
-
         updateTapPowerDisplay: function() {
-            if (this.elements.profileTapPower) {
-                this.elements.profileTapPower.textContent = this.formatNumber(this.state.tapPower);
-            }
+            if (this.elements.profileTapPower) this.elements.profileTapPower.textContent = this.formatNumber(this.state.tapPower);
         },
         updateMaxEnergyDisplay: function() {
-            if (this.elements.profileMaxEnergy) {
-                this.elements.profileMaxEnergy.textContent = this.formatNumber(this.state.maxEnergy);
-            }
+            if (this.elements.profileMaxEnergy) this.elements.profileMaxEnergy.textContent = this.formatNumber(this.state.maxEnergy);
         },
         updateFullEnergyBoostButton: function() {
             if (this.elements.boostFullEnergyBtn && this.elements.fullEnergyBoostsLeftDisplay) {
-                const boostsLeft = this.config.fullEnergyBoostsDaily - this.state.fullEnergyBoostsUsedToday;
-                this.elements.fullEnergyBoostsLeftDisplay.textContent = boostsLeft;
-                this.elements.boostFullEnergyBtn.disabled = boostsLeft <= 0;
+                const left = this.config.fullEnergyBoostsDaily - this.state.fullEnergyBoostsUsedToday;
+                this.elements.fullEnergyBoostsLeftDisplay.textContent = left;
+                this.elements.boostFullEnergyBtn.disabled = left <= 0;
             }
         },
-
         renderProfilePage: function() {
             this.log("Rendering Profile Page...");
-            if (this.elements.profileNameGreeting) {
-                this.elements.profileNameGreeting.textContent = `Welcome, ${this.state.userProfile.firstName || 'Player'}!`;
-            }
-            if (this.elements.profileUserId) {
-                this.elements.profileUserId.textContent = this.state.userProfile.id || 'N/A';
-            }
-            if (this.elements.profileJoinDate) {
-                this.elements.profileJoinDate.textContent = this.state.userProfile.joinDate ? new Date(this.state.userProfile.joinDate).toLocaleDateString() : 'N/A';
-            }
+            if (this.elements.profileNameGreeting) this.elements.profileNameGreeting.textContent = `Welcome, ${this.state.userProfile.firstName || 'Player'}!`;
+            if (this.elements.profileUserId) this.elements.profileUserId.textContent = this.state.userProfile.id || 'N/A';
+            if (this.elements.profileJoinDate) this.elements.profileJoinDate.textContent = this.state.userProfile.joinDate ? new Date(this.state.userProfile.joinDate).toLocaleDateString() : 'N/A';
             if (this.elements.profileAvatar) {
-                if (this.state.userProfile.photoUrl) {
-                    this.elements.profileAvatar.innerHTML = `<img src="${this.state.userProfile.photoUrl}" alt="User Avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
-                } else {
-                    this.elements.profileAvatar.textContent = (this.state.userProfile.firstName ? this.state.userProfile.firstName.charAt(0) : 'P').toUpperCase();
-                }
+                if (this.state.userProfile.photoUrl) this.elements.profileAvatar.innerHTML = `<img src="${this.state.userProfile.photoUrl}" alt="Avatar" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">`;
+                else this.elements.profileAvatar.textContent = (this.state.userProfile.firstName ? this.state.userProfile.firstName.charAt(0) : 'P').toUpperCase();
             }
-            
             if (this.elements.frenInviteBonusDisplay) this.elements.frenInviteBonusDisplay.textContent = this.formatNumber(this.config.frenInviteBonus);
             if (this.elements.frenWelcomeBonusDisplay) this.elements.frenWelcomeBonusDisplay.textContent = this.formatNumber(this.config.frenWelcomeBonus);
-            
-            this.updatePointsDisplay();
-            this.updatePPHDisplay();
-            this.updateTapPowerDisplay();
-            this.updateMaxEnergyDisplay();
+            this.updatePointsDisplay(); this.updatePPHDisplay(); this.updateTapPowerDisplay(); this.updateMaxEnergyDisplay();
         },
-
         renderUpgradesPage: function() {
             this.log("Rendering Upgrades Page...");
             if (!this.elements.upgradesListContainer) return;
-            this.elements.upgradesListContainer.innerHTML = ''; // Clear existing
-            
+            this.elements.upgradesListContainer.innerHTML = '';
             const categories = {};
-            this.state.availableUpgrades.forEach(upg => {
-                if(!categories[upg.category]) categories[upg.category] = [];
-                categories[upg.category].push(upg);
-            });
-
-            for (const categoryName in categories) {
-                const categoryDiv = document.createElement('div');
-                categoryDiv.className = 'upgrade-category card'; // Each category in its own card
-                
-                const categoryHeader = document.createElement('div');
-                categoryHeader.className = 'card-header';
-                categoryHeader.innerHTML = `<h3>${categoryName} Upgrades</h3>`;
-                categoryDiv.appendChild(categoryHeader);
-
-                const upgradeList = document.createElement('div'); // No ul, just divs for items
-                
-                categories[categoryName].forEach(upgrade => {
-                    const currentLevel = this.state.upgrades[upgrade.id] || 0;
-                    const cost = this.getUpgradeCost(upgrade);
-                    const effect = this.getUpgradeEffect(upgrade.id);
-                    const isMaxLevel = currentLevel >= upgrade.maxLevel;
-
-                    let effectText = '';
-                    if (upgrade.id === 'multitap') effectText = `+${this.formatNumber(effect)} per tap`;
-                    else if (upgrade.id === 'energyLimit') effectText = `Max ${this.formatNumber(effect)} energy`;
-                    else if (upgrade.id === 'energyRecharge') effectText = `+${this.formatNumber(effect)}/sec recharge`;
-                    else if (upgrade.id === 'profitPerHourPassive') effectText = `+${this.formatNumber(effect)} PPH`;
-                    else if (upgrade.id === 'offlineBonus') effectText = `${(effect * 100).toFixed(0)}% offline rate`;
-                    else effectText = `Value: ${this.formatNumber(effect)}`;
-
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'list-item upgrade-item';
-                    itemDiv.innerHTML = `
-                        <div class="list-item-icon">${upgrade.icon || '⚙️'}</div>
-                        <div class="item-info">
-                            <div class="item-name">${upgrade.name}</div>
-                            <div class="item-description">${upgrade.description}</div>
-                            <div class="current-effect">${effectText}</div>
-                        </div>
-                        <div class="item-action">
-                            <span class="level">Level: ${currentLevel}/${upgrade.maxLevel}</span>
-                            ${!isMaxLevel ? `<span class="cost">Cost: ${this.formatNumber(cost)} <span class="points-char">💰</span></span>` : ''}
-                            <button class="primary-btn buy-upgrade-btn" data-upgrade-id="${upgrade.id}" ${isMaxLevel || this.state.points < cost ? 'disabled' : ''}>
-                                ${isMaxLevel ? 'Max Level' : 'Upgrade'}
-                            </button>
-                        </div>
-                    `;
-                    upgradeList.appendChild(itemDiv);
+            this.state.availableUpgrades.forEach(upg => { if(!categories[upg.category]) categories[upg.category] = []; categories[upg.category].push(upg); });
+            for (const catName in categories) {
+                const catDiv = document.createElement('div'); catDiv.className = 'upgrade-category card';
+                catDiv.innerHTML = `<div class="card-header"><h3>${catName} Upgrades</h3></div>`;
+                const listDiv = document.createElement('div');
+                categories[catName].forEach(upg => {
+                    const lvl = this.state.upgrades[upg.id] || 0; const cost = this.getUpgradeCost(upg);
+                    const effect = this.getUpgradeEffect(upg.id); const maxLvl = lvl >= upg.maxLevel;
+                    let effTxt = '';
+                    if (upg.id === 'multitap') effTxt = `+${this.formatNumber(effect)}/tap`;
+                    else if (upg.id === 'energyLimit') effTxt = `Max ${this.formatNumber(effect)} energy`;
+                    else if (upg.id === 'energyRecharge') effTxt = `+${this.formatNumber(effect)}/sec`;
+                    else if (upg.id === 'profitPerHourPassive') effTxt = `+${this.formatNumber(effect)} PPH`;
+                    else if (upg.id === 'offlineBonus') effTxt = `${(effect * 100).toFixed(0)}% offline`;
+                    else effTxt = `Val: ${this.formatNumber(effect)}`;
+                    const item = document.createElement('div'); item.className = 'list-item upgrade-item';
+                    item.innerHTML = `<div class="list-item-icon">${upg.icon||'⚙️'}</div>
+                        <div class="item-info"><div class="item-name">${upg.name}</div><div class="item-description">${upg.description}</div><div class="current-effect">${effTxt}</div></div>
+                        <div class="item-action"><span class="level">Lvl: ${lvl}/${upg.maxLevel}</span>
+                        ${!maxLvl ? `<span class="cost">Cost: ${this.formatNumber(cost)}💰</span>` : ''}
+                        <button class="primary-btn buy-upgrade-btn" data-upgrade-id="${upg.id}" ${maxLvl||this.state.points<cost?'disabled':''}>${maxLvl?'Max': 'Upgrade'}</button></div>`;
+                    listDiv.appendChild(item);
                 });
-                categoryDiv.appendChild(upgradeList);
-                this.elements.upgradesListContainer.appendChild(categoryDiv);
+                catDiv.appendChild(listDiv); this.elements.upgradesListContainer.appendChild(catDiv);
             }
-
-            // Add event listeners for new buttons
-            this.elements.upgradesListContainer.querySelectorAll('.buy-upgrade-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => this.buyUpgrade(e.currentTarget.dataset.upgradeId));
-            });
+            this.elements.upgradesListContainer.querySelectorAll('.buy-upgrade-btn').forEach(btn => btn.addEventListener('click', (e) => this.buyUpgrade(e.currentTarget.dataset.upgradeId)));
         },
-
         renderTasksPage: function() {
             this.log("Rendering Tasks Page...");
             if (!this.elements.taskCategoriesContainer) return;
-            this.elements.taskCategoriesContainer.innerHTML = ''; // Clear existing
-
-            this.state.availableTasks.forEach(categoryData => {
-                const categoryCard = document.createElement('div');
-                categoryCard.className = 'card task-category';
-
-                const categoryHeader = document.createElement('div');
-                categoryHeader.className = 'card-header';
-                categoryHeader.innerHTML = `<h3>${categoryData.category}</h3>`;
-                categoryCard.appendChild(categoryHeader);
-
-                const taskListUl = document.createElement('ul');
-                taskListUl.className = 'task-list list-unstyled'; // list-unstyled from Bootstrap like styling
-
-                if (categoryData.tasks.length === 0) {
-                    taskListUl.innerHTML = `<li class="text-hint text-center p-2">No tasks available in this category.</li>`;
-                } else {
-                    categoryData.tasks.forEach(task => {
-                        const isCompleted = this.isTaskActuallyCompleted(task.id);
-                        let canClaim = false;
-                        let progressText = '';
-
-                        if (task.type === 'daily_counter' && !isCompleted) {
-                            const currentCount = this.getDailyCounter(task.counterKey);
-                            progressText = `(${currentCount}/${task.target})`;
-                            if (task.checkCompletion && task.checkCompletion()) {
-                                canClaim = true;
-                            }
-                        } else if (task.type === 'game_milestone' && !isCompleted) {
-                             if (task.checkCompletion && task.checkCompletion()) {
-                                canClaim = true;
-                            }
-                        } else if (task.type === 'external' && !isCompleted) {
-                            canClaim = true; // External tasks are often manually claimable after action
-                        } else if (task.type === 'daily' && !isCompleted) {
-                            canClaim = true;
-                        }
-
-
-                        const taskItem = document.createElement('li');
-                        taskItem.className = `list-item task-item ${isCompleted ? 'completed' : ''}`;
-                        taskItem.innerHTML = `
-                            <div class="list-item-icon">${task.icon || '✔️'}</div>
-                            <div class="item-info">
-                                <div class="item-name">${task.name} ${progressText}</div>
-                                <div class="item-description">${task.description}</div>
-                                <div class="item-reward">Reward: ${this.formatNumber(task.reward)} <span class="points-char">💰</span></div>
-                            </div>
-                            <div class="item-action task-action">
-                                <button class="primary-btn complete-task-btn" data-task-id="${task.id}" ${isCompleted ? 'disabled' : (!canClaim && (task.type !== 'external' && task.type !== 'game_event') ? 'disabled' : '')}>
-                                    ${isCompleted ? 'Claimed' : ( (task.type === 'daily_counter' || task.type === 'game_milestone') && !canClaim ? task.actionText : (task.link ? 'Go' : 'Claim'))}
-                                </button>
-                            </div>
-                        `;
-                        taskListUl.appendChild(taskItem);
-                    });
-                }
-                categoryCard.appendChild(taskListUl);
-                this.elements.taskCategoriesContainer.appendChild(categoryCard);
-            });
-
-            // Add event listeners for new buttons
-            this.elements.taskCategoriesContainer.querySelectorAll('.complete-task-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const taskId = e.currentTarget.dataset.taskId;
-                    const task = this.findTaskById(taskId);
-                    if (task && task.link && !this.isTaskActuallyCompleted(taskId)) { // If it has a link and not completed, it's likely an external action first
-                        if (window.Telegram && window.Telegram.WebApp) {
-                            window.Telegram.WebApp.openLink(task.link);
-                        } else {
-                            window.open(task.link, '_blank');
-                        }
-                        // Optionally, change button to "Verify" or "Claim" after clicking link
-                        // For now, we assume they need to click again to claim if it's that type.
-                        // Or, for simplicity, some tasks might auto-claim after a delay (not implemented here)
-                        // If the task is of type 'external', the button text might already be 'Claim' and we allow them to click it.
-                        if(task.type !== 'external') { // External tasks might require a second click to "Claim"
-                           e.currentTarget.textContent = 'Check'; // Example: change button to "Check"
-                           // Then the next click would call completeTask
-                        } else {
-                            this.completeTask(taskId); // Direct claim for simple external/daily
-                        }
-
-                    } else {
-                        this.completeTask(taskId);
+            this.elements.taskCategoriesContainer.innerHTML = '';
+            this.state.availableTasks.forEach(catData => {
+                const catCard = document.createElement('div'); catCard.className = 'card task-category';
+                catCard.innerHTML = `<div class="card-header"><h3>${catData.category}</h3></div>`;
+                const ul = document.createElement('ul'); ul.className = 'task-list list-unstyled';
+                if (catData.tasks.length === 0) ul.innerHTML = `<li class="text-hint text-center p-2">No tasks here.</li>`;
+                else catData.tasks.forEach(task => {
+                    const completed = this.isTaskActuallyCompleted(task.id); let canClaim = false; let progTxt = '';
+                    if (task.type === 'daily_counter' && !completed) {
+                        const count = this.getDailyCounter(task.counterKey); progTxt = `(${count}/${task.target})`;
+                        if (task.checkCompletion && task.checkCompletion()) canClaim = true;
+                    } else if ((task.type === 'game_milestone' || task.type === 'external' || task.type === 'daily') && !completed) {
+                        canClaim = (task.checkCompletion && task.checkCompletion()) || (task.type === 'external' || task.type === 'daily');
                     }
+                    const li = document.createElement('li'); li.className = `list-item task-item ${completed ? 'completed':''}`;
+                    li.innerHTML = `<div class="list-item-icon">${task.icon||'✔️'}</div>
+                        <div class="item-info"><div class="item-name">${task.name} ${progTxt}</div><div class="item-description">${task.description}</div><div class="item-reward">Reward: ${this.formatNumber(task.reward)}💰</div></div>
+                        <div class="item-action task-action"><button class="primary-btn complete-task-btn" data-task-id="${task.id}" ${completed?'disabled':(!canClaim && (task.type!=='external'&&task.type!=='game_event')?'disabled':'')}>
+                        ${completed?'Claimed':(((task.type==='daily_counter'||task.type==='game_milestone')&&!canClaim)?task.actionText:(task.link?'Go':'Claim'))}</button></div>`;
+                    ul.appendChild(li);
                 });
+                catCard.appendChild(ul); this.elements.taskCategoriesContainer.appendChild(catCard);
             });
+            this.elements.taskCategoriesContainer.querySelectorAll('.complete-task-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                const taskId = e.currentTarget.dataset.taskId; const task = this.findTaskById(taskId);
+                if (task && task.link && !this.isTaskActuallyCompleted(taskId)) {
+                    if(window.Telegram && window.Telegram.WebApp) window.Telegram.WebApp.openLink(task.link); else window.open(task.link, '_blank');
+                    if(task.type !== 'external') e.currentTarget.textContent = 'Check'; else this.completeTask(taskId);
+                } else this.completeTask(taskId);
+            }));
         },
-        
         renderFrensPage: function() {
             this.log("Rendering Frens Page...");
             if (!this.elements.frensList) return;
-            this.elements.frensList.innerHTML = ''; // Clear list
-
-            if (this.elements.frensCountDisplay) {
-                 this.elements.frensCountDisplay.textContent = this.state.frens.length;
-            }
+            this.elements.frensList.innerHTML = '';
+            if (this.elements.frensCountDisplay) this.elements.frensCountDisplay.textContent = this.state.frens.length;
             if (this.elements.frenInviteBonusDisplay) this.elements.frenInviteBonusDisplay.textContent = this.formatNumber(this.config.frenInviteBonus);
             if (this.elements.frenWelcomeBonusDisplay) this.elements.frenWelcomeBonusDisplay.textContent = this.formatNumber(this.config.frenWelcomeBonus);
-
-
-            if (this.state.frens.length === 0) {
-                this.elements.noFrensMessage.classList.remove('hidden');
-                return;
-            }
+            if (this.state.frens.length === 0) { this.elements.noFrensMessage.classList.remove('hidden'); return; }
             this.elements.noFrensMessage.classList.add('hidden');
-
             this.state.frens.forEach(fren => {
-                const frenItem = document.createElement('li');
-                frenItem.className = 'list-item fren-item';
-                // Placeholder for fren avatar
-                const avatarInitial = fren.name ? fren.name.charAt(0).toUpperCase() : 'F';
-                frenItem.innerHTML = `
-                    <div class="list-item-icon fren-avatar" style="${fren.photoUrl ? `background-image:url(${fren.photoUrl})` : ''}">${fren.photoUrl ? '' : avatarInitial}</div>
-                    <div class="item-info">
-                        <div class="item-name fren-name">${fren.name || 'Anonymous Fren'}</div>
-                        <div class="item-description">Joined: ${new Date(fren.joinDate).toLocaleDateString()}</div>
-                    </div>
-                    <div class="item-action">
-                        <span class="fren-bonus">+${this.formatNumber(fren.pointsEarnedForMe || 0)}</span>
-                    </div>
-                `;
-                this.elements.frensList.appendChild(frenItem);
+                const li = document.createElement('li'); li.className = 'list-item fren-item';
+                const initial = fren.name ? fren.name.charAt(0).toUpperCase() : 'F';
+                li.innerHTML = `<div class="list-item-icon fren-avatar" style="${fren.photoUrl?`background-image:url(${fren.photoUrl})`:''}">${fren.photoUrl?'':initial}</div>
+                    <div class="item-info"><div class="item-name fren-name">${fren.name||'Anon Fren'}</div><div class="item-description">Joined: ${new Date(fren.joinDate).toLocaleDateString()}</div></div>
+                    <div class="item-action"><span class="fren-bonus">+${this.formatNumber(fren.pointsEarnedForMe||0)}</span></div>`;
+                this.elements.frensList.appendChild(li);
             });
-            //Temp: Add simulate fren button if list is empty for testing
-            if (this.state.frens.length === 0 && this.config.debugMode) {
-                const simButton = document.createElement('button');
-                simButton.textContent = "Add Simulated Fren (Debug)";
-                simButton.className = "primary-btn mt-2";
-                simButton.onclick = () => this.addSimulatedFren();
-                this.elements.frensList.parentNode.appendChild(simButton);
+            if (this.state.frens.length === 0 && this.config.debugMode) { /* For debug */
+                const btn = document.createElement('button'); btn.textContent="Add Sim Fren"; btn.className="primary-btn mt-2"; btn.onclick=()=>this.addSimulatedFren();
+                this.elements.frensList.parentNode.appendChild(btn);
             }
         },
-        
         renderBoostsPage: function() {
             this.log("Rendering Boosts Page...");
             if (!this.elements.boostsListContainer) return;
-            this.elements.boostsListContainer.innerHTML = ''; // Clear existing
-
+            this.elements.boostsListContainer.innerHTML = '';
             this.state.availableBoosts.forEach(boost => {
-                const itemDiv = document.createElement('div');
-                itemDiv.className = 'list-item boost-item';
-                
-                let usesLeft = Infinity;
-                let buttonText = 'Activate';
-                letisDisabled = false;
-                let timerText = '';
-
+                const item = document.createElement('div'); item.className = 'list-item boost-item';
+                let usesLeft = Infinity, btnTxt = 'Activate', disabled = false, timerTxt = '';
                 if (boost.type === 'daily_limited' || boost.type === 'daily_timed') {
                     usesLeft = boost.getUsesLeft ? boost.getUsesLeft() : (boost.usesPerDay - (this.state.activeBoosts && this.state.activeBoosts[boost.id] && this.state.activeBoosts[boost.id].usesCountToday || 0));
-                    buttonText = boost.buttonText ? boost.buttonText(usesLeft) : (usesLeft > 0 ? `Activate (${usesLeft})` : 'Used Today');
-                    if (usesLeft <= 0) isDisabled = true;
+                    btnTxt = boost.buttonText ? boost.buttonText(usesLeft) : (usesLeft > 0 ? `Activate (${usesLeft})` : 'Used');
+                    if (usesLeft <= 0) disabled = true;
                 }
-                
                 if (boost.type === 'daily_timed' && this.state.activeBoosts && this.state.activeBoosts[boost.id] && this.state.activeBoosts[boost.id].active) {
-                    const timeLeft = Math.max(0, Math.round((this.state.activeBoosts[boost.id].endTime - Date.now()) / 1000));
-                    timerText = `<div class="boost-timer">Active: ${timeLeft}s left</div>`;
-                    buttonText = 'Active';
-                    isDisabled = true; // Cannot activate if already active
-                    itemDiv.classList.add('active');
+                    const timeLeft = Math.max(0, Math.round((this.state.activeBoosts[boost.id].endTime - Date.now())/1000));
+                    timerTxt = `<div class="boost-timer">Active: ${timeLeft}s</div>`; btnTxt = 'Active'; disabled = true; item.classList.add('active');
                 }
-
-
-                itemDiv.innerHTML = `
-                    <div class="list-item-icon">${boost.icon || '🔥'}</div>
-                    <div class="item-info">
-                        <div class="item-name">${boost.name}</div>
-                        <div class="item-description">${boost.description}</div>
-                        ${timerText}
-                        ${boost.cost > 0 ? `<div class="item-reward">Cost: ${this.formatNumber(boost.cost)} <span class="points-char">💰</span></div>` : ''}
-                    </div>
-                    <div class="item-action">
-                        <button class="primary-btn activate-boost-btn" data-boost-id="${boost.id}" ${isDisabled || (boost.cost > 0 && this.state.points < boost.cost) ? 'disabled' : ''}>
-                            ${buttonText}
-                        </button>
-                    </div>
-                `;
-                this.elements.boostsListContainer.appendChild(itemDiv);
+                item.innerHTML = `<div class="list-item-icon">${boost.icon||'🔥'}</div>
+                    <div class="item-info"><div class="item-name">${boost.name}</div><div class="item-description">${boost.description}</div>${timerTxt}
+                    ${boost.cost>0?`<div class="item-reward">Cost: ${this.formatNumber(boost.cost)}💰</div>`:''}</div>
+                    <div class="item-action"><button class="primary-btn activate-boost-btn" data-boost-id="${boost.id}" ${disabled||(boost.cost>0&&this.state.points<boost.cost)?'disabled':''}>${btnTxt}</button></div>`;
+                this.elements.boostsListContainer.appendChild(item);
             });
-            
-            // Add event listeners
-             this.elements.boostsListContainer.querySelectorAll('.activate-boost-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const boostId = e.currentTarget.dataset.boostId;
-                    const boost = this.state.availableBoosts.find(b => b.id === boostId);
-                    if (boost && boost.action) {
-                        if (boost.cost > 0 && this.state.points < boost.cost) {
-                            this.showToast("Not enough points for this boost!", "error");
-                            return;
-                        }
-                        if (boost.cost > 0) this.state.points -= boost.cost; this.updatePointsDisplay();
-                        boost.action();
-                    } else {
-                        this.showToast("Boost action not defined.", "error");
-                    }
-                });
-            });
+            this.elements.boostsListContainer.querySelectorAll('.activate-boost-btn').forEach(btn => btn.addEventListener('click', (e) => {
+                const bId = e.currentTarget.dataset.boostId; const b = this.state.availableBoosts.find(x=>x.id===bId);
+                if (b&&b.action) { if(b.cost>0&&this.state.points<b.cost){this.showToast("Not enough points!","error");return;} if(b.cost>0)this.state.points-=b.cost;this.updatePointsDisplay();b.action(); }
+                else this.showToast("Boost NA.", "error");
+            }));
         },
-        
         renderWithdrawHistory: function() {
             if (!this.elements.withdrawHistoryList) return;
-            this.elements.withdrawHistoryList.innerHTML = ''; // Clear
-            const history = this.state.withdrawHistory || [];
-
-            if (history.length === 0) {
-                this.elements.noWithdrawHistoryMessage.classList.remove('hidden');
-                return;
-            }
+            this.elements.withdrawHistoryList.innerHTML = '';
+            const hist = this.state.withdrawHistory || [];
+            if (hist.length === 0) { this.elements.noWithdrawHistoryMessage.classList.remove('hidden'); return; }
             this.elements.noWithdrawHistoryMessage.classList.add('hidden');
-
-            history.forEach(item => {
-                const li = document.createElement('li');
-                li.className = 'history-item';
-                li.innerHTML = `
-                    <div>
-                        <span class="amount">${this.formatNumber(item.amount)} Points</span> to ${item.method.replace('_', ' ').toUpperCase()}
-                        <br><small class="text-hint">Date: ${new Date(item.date).toLocaleString()}</small>
-                    </div>
-                    <div class="status ${item.status.toLowerCase()}">${item.status}</div>
-                `;
+            hist.forEach(item => {
+                const li = document.createElement('li'); li.className = 'history-item';
+                li.innerHTML = `<div><span class="amount">${this.formatNumber(item.amount)} Pts</span> to ${item.method.replace('_',' ').toUpperCase()}<br><small class="text-hint">Date: ${new Date(item.date).toLocaleString()}</small></div>
+                    <div class="status ${item.status.toLowerCase()}">${item.status}</div>`;
                 this.elements.withdrawHistoryList.appendChild(li);
             });
         },
 
-        // --- Navigation ---
         navigateToPage: function(pageId, isInitialLoad = false) {
-            this.log(`Navigating to page: ${pageId}`);
-            if (!this.elements[pageId]) {
-                this.error(`Page ${pageId} not found in cached elements.`);
-                // Fallback to tap page if requested page doesn't exist
-                if (pageId !== 'page-tap') this.navigateToPage('page-tap');
-                return;
-            }
-            
+            this.log(`Navigating to: ${pageId}`);
+            if (!this.elements[pageId]) { this.error(`Page ${pageId} NA.`); if(pageId!=='page-tap') this.navigateToPage('page-tap'); return; }
             const oldPage = document.querySelector('.page.active');
-            if (oldPage && !isInitialLoad) {
-                oldPage.classList.add('exiting');
-                // Remove 'active' after animation
-                setTimeout(() => {
-                    oldPage.classList.remove('active');
-                    oldPage.classList.remove('exiting');
-                }, 300); // Match animation duration
-            } else if (oldPage) {
-                 oldPage.classList.remove('active');
-            }
-
-
+            if (oldPage && !isInitialLoad) { oldPage.classList.add('exiting'); setTimeout(() => { oldPage.classList.remove('active','exiting');},300); }
+            else if (oldPage) oldPage.classList.remove('active');
             const newPage = this.elements[pageId];
-            // Delay adding active class for new page to allow old page to animate out
-            setTimeout(() => {
-                newPage.classList.add('active');
-            }, isInitialLoad ? 0 : 50); // Shorter delay or no delay for initial load
-
+            setTimeout(() => newPage.classList.add('active'), isInitialLoad ? 0 : 50);
             this.state.currentPage = pageId;
-
-            // Update nav button active states
-            this.elements.navButtons.forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.page === pageId);
-            });
-
-            // Specific page rendering/update logic
+            this.elements.navButtons.forEach(btn => btn.classList.toggle('active', btn.dataset.page === pageId));
             switch(pageId) {
-                case 'page-profile': this.renderProfilePage(); break;
-                case 'page-upgrades': this.renderUpgradesPage(); break;
-                case 'page-task': this.renderTasksPage(); break;
-                case 'page-frens': this.renderFrensPage(); break;
-                case 'page-boosts': this.renderBoostsPage(); break;
-                case 'page-withdraw': this.renderWithdrawHistory(); break;
-                // Tap page is generally always up-to-date via its specific update functions
+                case 'page-profile': this.renderProfilePage(); break; case 'page-upgrades': this.renderUpgradesPage(); break;
+                case 'page-task': this.renderTasksPage(); break; case 'page-frens': this.renderFrensPage(); break;
+                case 'page-boosts': this.renderBoostsPage(); break; case 'page-withdraw': this.renderWithdrawHistory(); break;
             }
-            
-            // Scroll to top of new page
             if (this.elements.contentArea) this.elements.contentArea.scrollTop = 0;
-            
-            if(!isInitialLoad) this.saveGameState(); // Save current page
+            if(!isInitialLoad) this.saveGameState();
         },
 
-        // --- Modals & Toasts ---
         showToast: function(message, type = 'info', duration = 3000) {
             if (!this.elements.toastNotification) return;
             const toast = this.elements.toastNotification;
-            toast.textContent = message;
-            toast.className = `show ${type}`; // type can be 'success', 'error', 'info'
-
-            setTimeout(() => {
-                toast.className = toast.className.replace('show', '').trim();
-            }, duration);
+            toast.textContent = message; toast.className = `show ${type}`;
+            setTimeout(() => { toast.className = toast.className.replace('show','').trim(); }, duration);
         },
-        
         showConfirmationModal: function(title, message, onConfirm, icon = '❓') {
             if (!this.elements.confirmationModal) return;
             this.elements.confirmationModalTitle.textContent = title;
-            this.elements.confirmationModalMessage.innerHTML = message; // Use innerHTML to allow for formatted messages
+            this.elements.confirmationModalMessage.innerHTML = message;
             this.elements.confirmationModalIcon.textContent = icon;
-            
-            // Clone and replace the confirm button to remove old listeners
-            const oldConfirmBtn = this.elements.confirmationModalConfirmBtn;
-            const newConfirmBtn = oldConfirmBtn.cloneNode(true);
-            oldConfirmBtn.parentNode.replaceChild(newConfirmBtn, oldConfirmBtn);
-            this.elements.confirmationModalConfirmBtn = newConfirmBtn; // Update cached element
-
-            this.elements.confirmationModalConfirmBtn.onclick = () => {
-                onConfirm();
-                this.hideConfirmationModal();
-            };
+            const oldConfirm = this.elements.confirmationModalConfirmBtn;
+            const newConfirm = oldConfirm.cloneNode(true);
+            oldConfirm.parentNode.replaceChild(newConfirm, oldConfirm);
+            this.elements.confirmationModalConfirmBtn = newConfirm;
+            this.elements.confirmationModalConfirmBtn.onclick = () => { onConfirm(); this.hideConfirmationModal(); };
             this.elements.confirmationModal.classList.add('show');
         },
+        hideConfirmationModal: function() { if (this.elements.confirmationModal) this.elements.confirmationModal.classList.remove('show'); },
+        showLoadingOverlay: function() { if (this.elements.loadingOverlay) this.elements.loadingOverlay.classList.add('show'); else console.error("Attempted to show loading overlay, but element not found/cached."); },
+        hideLoadingOverlay: function() { if (this.elements.loadingOverlay) { this.elements.loadingOverlay.classList.remove('show'); this.log("Loading overlay hidden.");} else this.error("Attempted to hide loading overlay, but element not found/cached."); },
 
-        hideConfirmationModal: function() {
-            if (this.elements.confirmationModal) {
-                this.elements.confirmationModal.classList.remove('show');
-            }
-        },
-
-        showLoadingOverlay: function() {
-            if (this.elements.loadingOverlay) this.elements.loadingOverlay.classList.add('show');
-        },
-        hideLoadingOverlay: function() {
-            if (this.elements.loadingOverlay) this.elements.loadingOverlay.classList.remove('show');
-        },
-
-        // --- Data Persistence (localStorage) ---
         saveGameState: function() {
             try {
-                const stateToSave = {
-                    points: this.state.points,
-                    level: this.state.level,
-                    currentEnergy: this.state.currentEnergy, // Save current energy
-                    lastEnergyUpdateTime: this.state.lastEnergyUpdateTime,
-                    lastLoginTime: this.state.lastLoginTime,
-                    dailyRewardClaimedTime: this.state.dailyRewardClaimedTime,
-                    fullEnergyBoostsUsedToday: this.state.fullEnergyBoostsUsedToday,
-                    fullEnergyBoostsLastReset: this.state.fullEnergyBoostsLastReset,
-                    upgrades: this.state.upgrades,
-                    tasksCompleted: this.state.tasksCompleted,
-                    frens: this.state.frens,
-                    userProfileId: this.state.userProfile.id, // Only save ID, other profile info comes from TG
-                    userProfileJoinDate: this.state.userProfile.joinDate,
-                    settings: this.state.settings,
-                    currentPage: this.state.currentPage,
-                    activeBoosts: this.state.activeBoosts, // Save active boosts state
-                    withdrawHistory: this.state.withdrawHistory,
-                };
+                const stateToSave = { points:this.state.points, level:this.state.level, currentEnergy:this.state.currentEnergy, lastEnergyUpdateTime:this.state.lastEnergyUpdateTime,
+                    lastLoginTime:this.state.lastLoginTime, dailyRewardClaimedTime:this.state.dailyRewardClaimedTime, fullEnergyBoostsUsedToday:this.state.fullEnergyBoostsUsedToday,
+                    fullEnergyBoostsLastReset:this.state.fullEnergyBoostsLastReset, upgrades:this.state.upgrades, tasksCompleted:this.state.tasksCompleted, frens:this.state.frens,
+                    userProfileId:this.state.userProfile.id, userProfileJoinDate:this.state.userProfile.joinDate, settings:this.state.settings, currentPage:this.state.currentPage,
+                    activeBoosts:this.state.activeBoosts, withdrawHistory:this.state.withdrawHistory, };
                 localStorage.setItem(this.config.localStoragePrefix + 'gameState', JSON.stringify(stateToSave));
                 this.log("Game state saved.");
-            } catch (e) {
-                this.error("Error saving game state:", e);
-                // Potentially notify user if storage is full or unavailable
-            }
+            } catch (e) { this.error("Error saving game state:", e); }
         },
-
         loadGameState: function() {
             this.log("Loading game state...");
             try {
-                const savedState = localStorage.getItem(this.config.localStoragePrefix + 'gameState');
-                if (savedState) {
-                    const parsedState = JSON.parse(savedState);
-                    // Merge saved state with defaults, prioritizing saved values
-                    this.state.points = parsedState.points || 0;
-                    this.state.level = parsedState.level || 1;
-                    // currentEnergy and lastEnergyUpdateTime will be handled by recharge logic after load
-                    this.state.currentEnergy = parsedState.currentEnergy !== undefined ? parsedState.currentEnergy : this.config.defaultEnergy; // Start with saved or full
-                    this.state.lastEnergyUpdateTime = parsedState.lastEnergyUpdateTime || Date.now();
-                    this.state.lastLoginTime = parsedState.lastLoginTime || Date.now(); // Important for offline earnings
-                    this.state.dailyRewardClaimedTime = parsedState.dailyRewardClaimedTime || 0;
-                    this.state.fullEnergyBoostsUsedToday = parsedState.fullEnergyBoostsUsedToday || 0;
-                    this.state.fullEnergyBoostsLastReset = parsedState.fullEnergyBoostsLastReset || 0;
-                    this.state.upgrades = parsedState.upgrades || {};
-                    this.state.tasksCompleted = parsedState.tasksCompleted || {};
-                    this.state.frens = parsedState.frens || [];
-                    this.state.settings = {...this.state.settings, ...parsedState.settings};
-                    this.state.currentPage = parsedState.currentPage || 'page-tap';
-                    this.state.activeBoosts = parsedState.activeBoosts || {};
-                    this.state.withdrawHistory = parsedState.withdrawHistory || [];
-
-
-                    // User profile ID from storage if not overridden by TG
-                    if (parsedState.userProfileId && !this.state.userProfile.id) {
-                        this.state.userProfile.id = parsedState.userProfileId;
-                    }
-                     if (parsedState.userProfileJoinDate) { // Load join date if available
-                        this.state.userProfile.joinDate = parsedState.userProfileJoinDate;
-                    }
-
-                    this.log("Game state loaded:", parsedState);
+                const saved = localStorage.getItem(this.config.localStoragePrefix + 'gameState');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    this.state.points = parsed.points||0; this.state.level = parsed.level||1;
+                    this.state.currentEnergy = parsed.currentEnergy !== undefined ? parsed.currentEnergy : this.config.defaultEnergy;
+                    this.state.lastEnergyUpdateTime = parsed.lastEnergyUpdateTime||Date.now(); this.state.lastLoginTime = parsed.lastLoginTime||Date.now();
+                    this.state.dailyRewardClaimedTime = parsed.dailyRewardClaimedTime||0; this.state.fullEnergyBoostsUsedToday = parsed.fullEnergyBoostsUsedToday||0;
+                    this.state.fullEnergyBoostsLastReset = parsed.fullEnergyBoostsLastReset||0; this.state.upgrades = parsed.upgrades||{};
+                    this.state.tasksCompleted = parsed.tasksCompleted||{}; this.state.frens = parsed.frens||[];
+                    this.state.settings = {...this.state.settings, ...parsed.settings}; this.state.currentPage = parsed.currentPage||'page-tap';
+                    this.state.activeBoosts = parsed.activeBoosts||{}; this.state.withdrawHistory = parsed.withdrawHistory||[];
+                    if (parsed.userProfileId && !this.state.userProfile.id) this.state.userProfile.id = parsed.userProfileId;
+                    if (parsed.userProfileJoinDate) this.state.userProfile.joinDate = parsed.userProfileJoinDate;
+                    this.log("Game state loaded.");
                 } else {
-                    this.log("No saved game state found. Initializing with defaults.");
-                    // First time load: Set defaults based on config and initial upgrade effects
-                    this.updateDerivedStats(); // This sets tapPower, maxEnergy, PPH
-                    this.state.currentEnergy = this.state.maxEnergy; // Start with full energy on first load
-                    this.state.lastLoginTime = Date.now();
-                    this.state.userProfile.joinDate = new Date().toISOString(); // Set join date for new user
-                    this.saveGameState(); // Save initial state
+                    this.log("No saved state. Init with defaults.");
+                    this.updateDerivedStats(); this.state.currentEnergy = this.state.maxEnergy;
+                    this.state.lastLoginTime = Date.now(); this.state.userProfile.joinDate = new Date().toISOString();
+                    this.saveGameState();
                 }
-            } catch (e) {
-                this.error("Error loading game state:", e);
-                // If loading fails, reset to default state (or parts of it)
-                // this.resetGameState(); // Be careful with full reset
-            }
-             // This needs to be called AFTER state.upgrades is loaded.
-            this.updateDerivedStats(); 
-            // Ensure current energy is not more than max after loading upgrades
+            } catch (e) { this.error("Error loading game state:", e); }
+            this.updateDerivedStats();
             this.state.currentEnergy = Math.min(this.state.currentEnergy, this.state.maxEnergy);
         },
-        
         resetGameState: function(confirm = true) {
             const doReset = () => {
                 localStorage.removeItem(this.config.localStoragePrefix + 'gameState');
-                // Re-initialize core defaults but keep user profile from TG if available
-                const tgUserProfile = {...this.state.userProfile}; // Preserve TG data
-
-                // Reset state object to nearly initial values
-                this.state.points = 0;
-                this.state.level = 1;
-                this.state.maxEnergy = this.config.defaultEnergy;
-                this.state.currentEnergy = this.config.defaultEnergy;
-                this.state.tapPower = this.config.pointsPerTap;
-                this.state.profitPerHour = 0;
-                this.state.lastEnergyUpdateTime = Date.now();
-                this.state.lastLoginTime = Date.now();
-                this.state.dailyRewardClaimedTime = 0;
-                this.state.fullEnergyBoostsUsedToday = 0;
-                this.state.fullEnergyBoostsLastReset = 0;
-                this.state.upgrades = {};
-                this.state.tasksCompleted = {};
-                this.state.frens = [];
-                this.state.activeBoosts = {};
-                this.state.withdrawHistory = [];
-                // Restore TG user profile data
-                this.state.userProfile = tgUserProfile;
-                if (!this.state.userProfile.joinDate) this.state.userProfile.joinDate = new Date().toISOString();
-
-                this.initializeGameData(); // Re-init upgrades definitions and default levels
-                this.updateAllUI();
-                this.saveGameState();
-                this.showToast("Game Reset Successfully!", "success");
-                this.log("Game state has been reset.");
-                this.navigateToPage('page-tap');
+                const tgUser = {...this.state.userProfile};
+                Object.assign(this.state, { points:0,level:1,maxEnergy:this.config.defaultEnergy,currentEnergy:this.config.defaultEnergy,tapPower:this.config.pointsPerTap,
+                    profitPerHour:0,lastEnergyUpdateTime:Date.now(),lastLoginTime:Date.now(),dailyRewardClaimedTime:0,fullEnergyBoostsUsedToday:0,fullEnergyBoostsLastReset:0,
+                    upgrades:{},tasksCompleted:{},frens:[],activeBoosts:{},withdrawHistory:[] });
+                this.state.userProfile = tgUser; if (!this.state.userProfile.joinDate) this.state.userProfile.joinDate = new Date().toISOString();
+                this.initializeGameData(); this.updateAllUI(); this.saveGameState();
+                this.showToast("Game Reset!", "success"); this.log("Game state reset."); this.navigateToPage('page-tap');
             };
-
-            if (confirm) {
-                this.showConfirmationModal(
-                    "Reset Game?",
-                    "Are you sure you want to reset all your game progress? This action cannot be undone.",
-                    doReset,
-                    "⚠️"
-                );
-            } else {
-                doReset();
-            }
+            if (confirm) this.showConfirmationModal("Reset Game?", "Sure? This cannot be undone.", doReset, "⚠️");
+            else doReset();
         },
 
-
-        // --- Utilities ---
         formatNumber: function(num) {
             if (num === undefined || num === null) return '0';
             if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
             if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
-            if (num >= 10000) return (num / 1000).toFixed(1) + 'K'; // Show one decimal for 10K+
-            return Math.floor(num).toLocaleString('en-US'); // Comma separators for smaller numbers
+            if (num >= 10000) return (num / 1000).toFixed(1) + 'K';
+            return Math.floor(num).toLocaleString('en-US');
         },
-
-        copyToClipboard: function(text, successMessage = "Copied to clipboard!") {
+        copyToClipboard: function(text, msg = "Copied!") {
             if (navigator.clipboard && window.isSecureContext) {
-                navigator.clipboard.writeText(text)
-                    .then(() => this.showToast(successMessage, "success"))
-                    .catch(err => this.showToast("Failed to copy.", "error"));
+                navigator.clipboard.writeText(text).then(() => this.showToast(msg, "success")).catch(() => this.showToast("Copy failed.", "error"));
             } else {
-                // Fallback for older browsers
-                const textArea = document.createElement("textarea");
-                textArea.value = text;
-                textArea.style.position = "fixed"; // Prevent scrolling to bottom
-                document.body.appendChild(textArea);
-                textArea.focus();
-                textArea.select();
-                try {
-                    document.execCommand('copy');
-                    this.showToast(successMessage, "success");
-                } catch (err) {
-                    this.showToast("Failed to copy (fallback).", "error");
-                }
-                document.body.removeChild(textArea);
+                const ta = document.createElement("textarea"); ta.value=text; ta.style.position="fixed"; document.body.appendChild(ta);
+                ta.focus(); ta.select(); try { document.execCommand('copy'); this.showToast(msg, "success"); }
+                catch (err) { this.showToast("Copy failed (fallback).", "error"); } document.body.removeChild(ta);
             }
         },
-        
         copyReferralLink: function() {
-            const referralId = this.state.userProfile.id || 'testuser';
-            const botUsername = "xotswap_bot"; // Replace with your actual bot username
-            const referralLink = `https://t.me/${botUsername}?start=ref_${referralId}`;
-            this.copyToClipboard(referralLink, "Referral link copied!");
+            const refId = this.state.userProfile.id || 'testuser'; const botName = "xotswap_bot";
+            const refLink = `https://t.me/${botName}?start=ref_${refId}`;
+            this.copyToClipboard(refLink, "Referral link copied!");
         },
-
-        log: function(...args) {
-            if (this.config.debugMode) {
-                console.log(`[${this.config.appName}]`, ...args);
-            }
-        },
-
-        error: function(...args) {
-            console.error(`[${this.config.appName} ERROR]`, ...args);
-            // Optionally, could send errors to a logging service if not in debug mode
-        }
+        log: function(...args) { if (this.config.debugMode) console.log(`[${this.config.appName}]`, ...args); },
+        error: function(...args) { console.error(`[${this.config.appName} ERROR]`, ...args); }
     };
 
-    // --- App Entry Point ---
     document.addEventListener('DOMContentLoaded', () => {
-        // Show loading overlay initially, app.init() will hide it
-        const loadingOverlay = document.getElementById('loading-overlay');
-        if (loadingOverlay) loadingOverlay.classList.add('show');
-        
-        // Artificial delay for splash/loading screen feel (optional)
-        // setTimeout(() => {
-            app.init();
-        // }, 500); 
+        const loadingOverlayElem = document.getElementById('loading-overlay');
+        if (loadingOverlayElem) {
+            loadingOverlayElem.classList.add('show');
+            // Use a direct console.log here as app.log might not be ready if debugMode is false
+            if(app.config.debugMode) console.log("[Xot_swap Power Play] Loading overlay shown by DOMContentLoaded.");
+        } else {
+            console.error("[Xot_swap Power Play FATAL] loading-overlay element NOT FOUND by DOMContentLoaded.");
+        }
+        app.init();
     });
 
-    // Expose app to global scope for debugging if needed
-    if (app.config.debugMode) {
-        window.xotApp = app;
-        console.log("XotSwap App exposed as window.xotApp for debugging.");
-        console.log("Try: xotApp.state.points += 10000; xotApp.updateAllUI(); xotApp.saveGameState();");
-        console.log("Or: xotApp.resetGameState(false); to reset without confirmation (for quick testing).");
-        console.log("Or: xotApp.addSimulatedFren();");
+    if (app.config.debugMode) { // This check needs to be outside the main IIFE or class if app is not global yet
+        window.xotApp = app; // Expose app for debugging
     }
-
     </script>
 </body>
 </html>
