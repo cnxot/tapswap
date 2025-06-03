@@ -1,71 +1,165 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Xot_swap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Xot_swap - Power Play</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
+        /*
+         * Xot_swap Power Play - Main Stylesheet
+         * Version: 1.0.0
+         * Author: XotSwap Team
+         * Description: Comprehensive styling for the Telegram Web App.
+         */
+
         :root {
-            --primary-color: #28a745; /* Greenish */
-            --secondary-color: #17a2b8; /* Bluish */
-            --background-color: #f4f4f9; /* Light grey */
-            --card-background: #ffffff;
-            --text-color: #333333;
-            --nav-background: #ffffff;
-            --nav-text-color: #555555;
+            /* Telegram Theme Variables (Defaults, will be overridden if TG provides them) */
+            --tg-theme-bg-color: #ffffff;
+            --tg-theme-text-color: #000000;
+            --tg-theme-hint-color: #707579;
+            --tg-theme-link-color: #2481cc;
+            --tg-theme-button-color: #2481cc;
+            --tg-theme-button-text-color: #ffffff;
+            --tg-theme-secondary-bg-color: #f0f0f0;
+
+            /* Custom App Theme Variables */
+            --primary-color: var(--tg-theme-button-color, #007bff); /* Deep Sky Blue */
+            --secondary-color: #17a2b8; /* Pacific Blue */
+            --accent-color: #ffc107; /* Golden Yellow */
+            --accent-color-darker: #e0a800; /* Darker Golden Yellow for hovers */
+            --background-color: var(--tg-theme-bg-color, #f4f4f9); /* Light Lavender Gray */
+            --card-background: var(--tg-theme-secondary-bg-color, #ffffff);
+            --text-color: var(--tg-theme-text-color, #343a40); /* Dark Gray */
+            --nav-background: var(--tg-theme-secondary-bg-color, #ffffff);
+            --nav-text-color: var(--tg-theme-hint-color, #6c757d); /* Medium Gray */
             --nav-active-color: var(--primary-color);
             --button-color: var(--primary-color);
-            --button-text-color: #ffffff;
-            --energy-bar-background: #e9ecef;
-            --energy-bar-fill: #ffc107; /* Yellow for energy */
+            --button-text-color: var(--tg-theme-button-text-color, #ffffff);
+            --energy-bar-background: #e9ecef; /* Light Gray */
+            --energy-bar-fill: linear-gradient(90deg, var(--accent-color), #ffd700); /* Gold Gradient */
             --points-color: var(--primary-color);
-            --header-height: 50px;
-            --nav-height: 60px;
+            --success-color: #28a745; /* Green */
+            --danger-color: #dc3545; /* Red */
+            --info-color: #17a2b8; /* Teal */
+            --warning-color: #ffc107; /* Yellow */
+
+            /* Dimensions & Spacing */
+            --header-height: 55px;
+            --nav-height: 65px;
+            --button-padding: 12px 24px;
+            --button-font-size: 1em;
+            --card-border-radius: 15px;
+            --button-border-radius: 10px;
+            --container-padding: 20px;
+            --item-spacing: 15px;
+
+            /* Typography */
+            --font-family-main: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            --font-size-small: 0.85em;
+            --font-size-medium: 1em;
+            --font-size-large: 1.2em;
+            --font-size-xlarge: 1.5em;
+            --font-size-xxlarge: 2em;
+            --font-size-points: 2.8em;
+
+            /* Shadows */
+            --shadow-sm: 0 2px 4px rgba(0,0,0,0.05);
+            --shadow-md: 0 4px 8px rgba(0,0,0,0.1);
+            --shadow-lg: 0 6px 15px rgba(0,0,0,0.12);
+
+            /* Transitions */
+            --transition-fast: 0.15s ease-out;
+            --transition-medium: 0.3s ease-out;
+        }
+
+        /* Global Reset & Base Styles */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape */
         }
 
         body {
-            margin: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            font-family: var(--font-family-main);
             background-color: var(--background-color);
             color: var(--text-color);
             display: flex;
             flex-direction: column;
             height: 100vh;
-            overflow: hidden; /* Prevent body scroll, pages will scroll if needed */
+            height: calc(var(--vh, 1vh) * 100); /* Fallback for vh units on mobile */
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent; /* Remove tap highlight */
+            font-size: var(--font-size-medium);
+            line-height: 1.6;
         }
 
+        /* App Header */
         #app-header {
-            background-color: var(--primary-color);
-            color: white;
+            background: linear-gradient(135deg, var(--primary-color), color-mix(in srgb, var(--primary-color) 80%, black));
+            color: var(--button-text-color);
             text-align: center;
-            padding: 15px 0;
-            font-size: 1.2em;
-            font-weight: bold;
+            padding: 0 15px;
+            font-size: var(--font-size-large);
+            font-weight: 600;
             height: var(--header-height);
-            line-height: calc(var(--header-height) - 30px); /* vertical align text */
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             z-index: 1000;
+            box-shadow: var(--shadow-md);
+        }
+        #app-header img.header-logo {
+            height: 30px;
+            margin-right: 10px;
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
         }
 
+        /* Content Area */
         .content-area {
             flex-grow: 1;
-            padding-top: var(--header-height); /* Space for fixed header */
-            padding-bottom: var(--nav-height); /* Space for fixed nav */
-            overflow-y: auto; /* Allow scrolling within content area */
+            padding-top: var(--header-height);
+            padding-bottom: var(--nav-height);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
         }
 
+        /* Page Transitions */
         .page {
             display: none;
-            padding: 20px;
-            min-height: calc(100vh - var(--header-height) - var(--nav-height) - 40px); /* Full viewport minus headers/padding */
+            padding: var(--container-padding);
+            min-height: calc(100% - (var(--container-padding) * 2));
+            animation-duration: var(--transition-medium);
+            animation-fill-mode: forwards;
         }
 
         .page.active {
             display: block;
+            animation-name: pageFadeIn;
         }
+        
+        .page.exiting {
+            animation-name: pageFadeOut;
+        }
+
+        @keyframes pageFadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pageFadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-15px); }
+        }
+
 
         /* Bottom Navigation */
         #bottom-nav {
@@ -77,9 +171,9 @@
             background-color: var(--nav-background);
             display: flex;
             justify-content: space-around;
-            align-items: center;
-            border-top: 1px solid #ddd;
-            box-shadow: 0 -2px 5px rgba(0,0,0,0.1);
+            align-items: stretch; /* Ensure buttons fill height */
+            border-top: 1px solid color-mix(in srgb, var(--nav-text-color) 20%, transparent);
+            box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
             z-index: 1000;
         }
 
@@ -87,417 +181,2757 @@
             background: none;
             border: none;
             color: var(--nav-text-color);
-            font-size: 10px; /* Smaller text for icons + text */
+            font-size: 10px; /* Slightly smaller for more icon space */
+            font-weight: 500;
             cursor: pointer;
-            padding: 5px;
+            padding: 6px 5px; /* Adjusted padding */
             text-align: center;
             flex: 1;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
+            transition: color var(--transition-fast), background-color var(--transition-fast);
+            position: relative;
         }
         
         .nav-btn svg {
             width: 24px;
             height: 24px;
             margin-bottom: 4px;
+            fill: currentColor; /* Inherit color from parent for easier state changes */
+            transition: transform var(--transition-fast);
+        }
+
+        .nav-btn:hover {
+            background-color: color-mix(in srgb, var(--nav-active-color) 10%, transparent);
         }
 
         .nav-btn.active {
             color: var(--nav-active-color);
-            font-weight: bold;
+            font-weight: 600;
         }
         
-        .nav-btn.active svg path {
-            fill: var(--nav-active-color);
+        .nav-btn.active svg {
+            /* fill: var(--nav-active-color); // Not needed if using currentColor */
+            transform: scale(1.1); /* Slight scale effect for active icon */
+        }
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 3px;
+            background-color: var(--nav-active-color);
+            border-radius: 3px 3px 0 0;
         }
 
-        /* Tap Page */
+
+        /* Tap Page Specifics */
         #page-tap {
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between; /* Distribute elements nicely */
             text-align: center;
+            padding: 10px; /* Reduced padding to maximize space */
+            gap: 15px; /* Spacing between main elements */
         }
 
-        #points-display {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: var(--points-color);
-            margin-bottom: 20px;
-        }
-
-        #tap-button {
-            width: 200px; /* Adjust size as needed */
-            height: 200px; /* Adjust size as needed */
-            cursor: pointer;
-            border-radius: 50%; /* Make it round if you want a circular tap area */
-            /* background-color: #ddd; Remove if image fills it */
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            user-select: none; /* Prevent text selection on rapid taps */
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            transition: transform 0.05s ease-out; /* Tap feedback */
-        }
-        #tap-button:active {
-            transform: scale(0.95);
-        }
-
-        #tap-image { /* This is the cat/hamster image */
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Ensures image fits well */
-        }
-
-        #energy-container {
-            width: 80%;
-            max-width: 300px;
-            text-align: center;
-        }
-
-        #energy-bar-bg {
-            background-color: var(--energy-bar-background);
-            border-radius: 10px;
-            height: 20px;
-            overflow: hidden;
-            margin-top: 5px;
-        }
-
-        #energy-bar-fill {
-            background-color: var(--energy-bar-fill);
-            width: 100%; /* Controlled by JS */
-            height: 100%;
-            border-radius: 10px;
-            transition: width 0.2s ease-in-out;
-        }
-        
-        #energy-text {
-            font-size: 0.9em;
-            margin-top: 5px;
-        }
-
-        /* Profile Page */
-        #page-profile .profile-item {
-            background-color: var(--card-background);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        #page-profile .profile-item strong {
-            color: var(--primary-color);
-        }
-
-        /* Task Page */
-        .task-list {
-            list-style: none;
-            padding: 0;
-        }
-        .task-item {
-            background-color: var(--card-background);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        .tap-header-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-        }
-        .task-item .task-info {
-            flex-grow: 1;
-        }
-        .task-item .task-name {
-            font-weight: bold;
-        }
-        .task-item .task-reward {
-            font-size: 0.9em;
-            color: #555;
-        }
-        .task-item .task-action button {
-            background-color: var(--button-color);
-            color: var(--button-text-color);
-            border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 0.9em;
-        }
-        .task-item .task-action button:disabled {
-            background-color: #ccc;
-            cursor: not-allowed;
-        }
-
-        /* Withdraw Page */
-        #page-withdraw .form-group {
-            margin-bottom: 15px;
-        }
-        #page-withdraw label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        #page-withdraw input[type="number"],
-        #page-withdraw select {
-            width: calc(100% - 22px); /* Full width minus padding/border */
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-        #page-withdraw button {
-            background-color: var(--button-color);
-            color: var(--button-text-color);
-            border: none;
-            padding: 12px 20px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 1em;
             width: 100%;
+            padding: 0 5px; /* Minimal horizontal padding */
+            gap: 10px;
         }
-        #page-withdraw button:disabled {
-            background-color: #ccc;
-        }
-        #withdraw-history {
-            margin-top: 20px;
-        }
-        #withdraw-history h3 {
-            margin-bottom: 10px;
-        }
-        .history-item {
+        .tap-header-info > div {
             background-color: var(--card-background);
-            padding: 10px;
-            margin-bottom: 5px;
-            border-radius: 5px;
-            font-size: 0.9em;
-        }
-
-        /* General utility */
-        .card {
-            background-color: var(--card-background);
-            padding: 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px_4px rgba(0,0,0,0.1);
-        }
-        .text-center {
+            padding: 8px 12px;
+            border-radius: var(--card-border-radius);
+            box-shadow: var(--shadow-sm);
+            font-size: var(--font-size-small);
+            font-weight: 500;
+            flex-grow: 1;
             text-align: center;
         }
+        #profit-per-hour-display, #level-display {
+            white-space: nowrap;
+        }
+
+        #points-display-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 10px 0; /* Vertical margin */
+            flex-direction: column; /* Stack coin and points */
+        }
+        #points-display-icon {
+            width: 40px; /* Larger coin icon */
+            height: 40px;
+            margin-bottom: 5px;
+            /* background-image: url('your-coin-icon.svg'); SVG preferred */
+            /* background-size: contain; */
+            /* background-repeat: no-repeat; */
+            /* For demo, using accent color circle */
+            background-color: var(--accent-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--button-text-color);
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        #points-display {
+            font-size: var(--font-size-points);
+            font-weight: 700; /* Bolder */
+            color: var(--points-color);
+            line-height: 1;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        #tap-button-container {
+            position: relative; /* For floating scores */
+            margin: 10px 0; /* Vertical margin */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%; /* Full width for centering */
+        }
+        #tap-button {
+            width: clamp(200px, 65vw, 280px); /* Responsive size */
+            height: clamp(200px, 65vw, 280px);
+            cursor: pointer;
+            border-radius: 50%;
+            background-color: var(--card-background);
+            background-image: radial-gradient(circle, color-mix(in srgb, var(--accent-color) 20%, transparent) 0%, transparent 70%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            user-select: none;
+            -webkit-user-select: none;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15), 0 0 0 8px color-mix(in srgb, var(--accent-color) 30%, transparent); /* Enhanced glow */
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+            overflow: hidden;
+        }
+        #tap-button:active {
+            transform: scale(0.94);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2), 0 0 0 5px color-mix(in srgb, var(--accent-color) 50%, transparent);
+        }
+        #tap-image {
+            width: 85%; /* Adjust if image has padding */
+            height: 85%;
+            object-fit: contain;
+            border-radius: 50%; /* If image itself isn't round */
+            pointer-events: none; /* Prevent image from interfering with tap */
+            transition: transform 0.1s ease-out;
+        }
+        #tap-button:active #tap-image {
+            transform: scale(1.05); /* Subtle image pop on tap */
+        }
+
+        #energy-container {
+            width: 95%;
+            max-width: 400px;
+            text-align: center;
+            padding: 10px;
+            background-color: var(--card-background);
+            border-radius: var(--card-border-radius);
+            box-shadow: var(--shadow-sm);
+        }
+        #energy-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: var(--font-size-medium);
+        }
+        #energy-text { 
+            color: var(--text-color); 
+            font-weight: 500;
+        }
+        #boost-full-energy-btn { /* Renamed for clarity */
+            background-color: var(--accent-color);
+            color: var(--text-color); /* Better contrast on yellow */
+            border: none;
+            padding: 8px 14px;
+            border-radius: var(--button-border-radius);
+            font-size: var(--font-size-small);
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color var(--transition-fast);
+        }
+        #boost-full-energy-btn:hover {
+            background-color: var(--accent-color-darker);
+        }
+        #boost-full-energy-btn:disabled {
+            background-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        #energy-bar-bg {
+            background-color: var(--energy-bar-background);
+            border-radius: 20px; /* More rounded */
+            height: 24px;
+            overflow: hidden;
+            margin-top: 8px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            position: relative; /* For percentage text */
+        }
+        #energy-bar-fill {
+            background: var(--energy-bar-fill);
+            width: 100%;
+            height: 100%;
+            border-radius: 20px; /* Match parent */
+            transition: width 0.3s ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        #energy-percentage-text {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 0.8em;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+            opacity: 0; /* Hidden by default, shown if not enough contrast */
+        }
+        /* Logic to show text if bar is too short or color too light would be in JS or advanced CSS */
 
         /* Floating tap score animation */
         .tap-score-animation {
             position: absolute;
-            font-size: 1.5em; /* Adjust as needed */
-            color: var(--primary-color); /* Or gold, etc. */
+            font-size: var(--font-size-xlarge); /* Larger floating score */
+            color: var(--accent-color);
             font-weight: bold;
             user-select: none;
             pointer-events: none;
-            animation: floatUpAndFade 1s forwards;
-            z-index: 100; /* Above the tap button */
+            animation: floatUpAndFade 1.2s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Added easing */
+            text-shadow: 0 0 8px rgba(0,0,0,0.4);
+            z-index: 101; /* Above tap button */
+        }
+        @keyframes floatUpAndFade {
+            0% { opacity: 1; transform: translateY(0) scale(0.8); }
+            20% { opacity: 0.9; transform: translateY(-20px) scale(1.1); }
+            100% { opacity: 0; transform: translateY(-80px) scale(0.9); }
         }
 
-        @keyframes floatUpAndFade {
-            0% {
-                opacity: 1;
-                transform: translateY(0);
-            }
-            100% {
-                opacity: 0;
-                transform: translateY(-50px); /* Adjust vertical distance */
-            }
+        /* General UI Elements */
+        .card {
+            background-color: var(--card-background);
+            padding: var(--container-padding);
+            margin-bottom: var(--item-spacing);
+            border-radius: var(--card-border-radius);
+            box-shadow: var(--shadow-md);
+            transition: box-shadow var(--transition-medium), transform var(--transition-medium);
+        }
+        .card:hover {
+            /* box-shadow: var(--shadow-lg); */ /* Can be too much on mobile */
+        }
+        .card-header {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid color-mix(in srgb, var(--text-color) 10%, transparent);
+        }
+        .card-header h2, .card-header h3 {
+            margin-top: 0;
+            margin-bottom: 5px; /* Added margin for subtitle */
+            color: var(--primary-color);
+        }
+        .card-header p.subtitle {
+            font-size: var(--font-size-small);
+            color: var(--tg-theme-hint-color);
+            margin-top: 0;
+        }
+
+        button.primary-btn, input[type="submit"].primary-btn {
+            background-color: var(--button-color);
+            color: var(--button-text-color);
+            border: none;
+            padding: var(--button-padding);
+            border-radius: var(--button-border-radius);
+            cursor: pointer;
+            font-size: var(--button-font-size);
+            font-weight: 600;
+            width: 100%;
+            text-align: center;
+            transition: background-color var(--transition-fast), transform var(--transition-fast);
+            display: inline-flex; /* For icon alignment */
+            align-items: center;
+            justify-content: center;
+            gap: 8px; /* Space between icon and text */
+        }
+        button.primary-btn:hover:not(:disabled) { 
+            background-color: color-mix(in srgb, var(--button-color) 85%, black);
+            transform: translateY(-1px); /* Subtle lift */
+        }
+        button.primary-btn:active:not(:disabled) { 
+            transform: scale(0.98) translateY(0); 
+        }
+        button.primary-btn:disabled {
+            background-color: #cccccc;
+            color: #666666;
+            cursor: not-allowed;
+            opacity: 0.7;
+        }
+        button.secondary-btn {
+            background-color: var(--card-background);
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+        button.secondary-btn:hover:not(:disabled) {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+        }
+
+
+        /* Profile Page */
+        #page-profile .profile-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--item-spacing);
+            padding-bottom: var(--item-spacing);
+            border-bottom: 1px solid #eee;
+        }
+        #profile-avatar {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-right: 15px;
+            object-fit: cover; /* If using an image */
+        }
+        #profile-greeting h2 { margin: 0 0 5px 0; }
+        #profile-greeting p { font-size: var(--font-size-small); color: var(--tg-theme-hint-color); margin: 0;}
+
+        #page-profile .profile-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #page-profile .profile-item:last-child { border-bottom: none; }
+        #page-profile .profile-item-label { font-weight: 500; color: var(--text-color); }
+        #page-profile .profile-item-value { color: var(--primary-color); font-weight: 600; text-align: right;}
+        #profile-referral-link-container { margin-top: var(--item-spacing); }
+        #profile-referral-link {
+            display: block; /* Make it block for better tap area */
+            padding: 12px;
+            background-color: var(--background-color);
+            border: 1px dashed var(--primary-color);
+            border-radius: var(--button-border-radius);
+            word-break: break-all;
+            margin-top: 5px;
+            cursor: pointer;
+            text-align: center;
+            color: var(--primary-color);
+            font-weight: 500;
+            transition: background-color var(--transition-fast);
+        }
+        #profile-referral-link:hover {
+            background-color: color-mix(in srgb, var(--primary-color) 10%, transparent);
+        }
+        .profile-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: var(--item-spacing);
+        }
+        .stat-card {
+            background-color: var(--background-color);
+            padding: 15px;
+            border-radius: var(--button-border-radius);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+        .stat-card .stat-value {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: var(--primary-color);
+            display: block;
+        }
+        .stat-card .stat-label {
+            font-size: 0.8em;
+            color: var(--tg-theme-hint-color);
+        }
+
+        /* Task Page & Upgrade Page Common List Item Styles */
+        .list-item {
+            background-color: var(--card-background);
+            padding: 15px;
+            margin-bottom: 12px;
+            border-radius: var(--card-border-radius);
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        .list-item:hover {
+             transform: translateY(-2px);
+             box-shadow: var(--shadow-md);
+        }
+        .list-item-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 15px;
+            border-radius: 8px;
+            background-color: var(--accent-color); /* Placeholder */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            color: white;
+        }
+        .list-item-icon img {
+            max-width: 100%;
+            max-height: 100%;
+            border-radius: 8px;
+        }
+
+        .item-info { flex-grow: 1; margin-right: 10px; }
+        .item-name { font-weight: 600; font-size: 1.05em; color: var(--text-color); }
+        .item-description, .item-effect, .item-reward { 
+            font-size: var(--font-size-small); 
+            color: var(--tg-theme-hint-color); 
+            margin-top: 4px; 
+            line-height: 1.4;
+        }
+        .item-action button {
+            padding: 10px 18px;
+            font-size: var(--font-size-small);
+            font-weight: 600;
+            min-width: 90px; /* Ensure buttons have a decent width */
+        }
+        .item-action .cost, .item-action .level {
+            display: block;
+            font-size: var(--font-size-small);
+            color: var(--points-color);
+            margin-bottom: 5px;
+            text-align: right;
+            font-weight: 500;
+        }
+        .item-action .level { color: var(--secondary-color); }
+
+        /* Task Page Specifics */
+        #task-list { list-style: none; padding: 0; }
+        .task-item.completed .item-info .item-name {
+            text-decoration: line-through;
+            color: var(--tg-theme-hint-color);
+        }
+        .task-action button.completed { 
+            background-color: var(--success-color); 
+            border-color: var(--success-color);
+            pointer-events: none; /* Disable clicks */
+        }
+        .task-action button.completed:hover {
+            background-color: color-mix(in srgb, var(--success-color) 85%, black);
+        }
+
+
+        /* Upgrades Page Specifics */
+        #page-upgrades .upgrade-category {
+            margin-bottom: var(--item-spacing);
+        }
+        #page-upgrades .upgrade-category h3 {
+            /* Use card-header style or make a specific one */
+            font-size: var(--font-size-large);
+            color: var(--secondary-color);
+            padding-bottom: 8px;
+            margin-bottom: var(--item-spacing);
+            border-bottom: 2px solid var(--secondary-color);
+        }
+        /* .upgrade-item is now .list-item */
+        .upgrade-item .item-info .current-effect {
+            font-size: var(--font-size-small);
+            color: var(--success-color);
+            font-weight: 500;
+        }
+
+
+        /* Frens Page */
+        #page-frens .frens-header {
+            text-align: center;
+            margin-bottom: var(--item-spacing);
+        }
+        #page-frens .frens-header .invite-bonus {
+            font-size: var(--font-size-small);
+            color: var(--success-color);
+            font-weight: 500;
+        }
+        .fren-item { /* Uses .list-item styles */ }
+        .fren-item .fren-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--tg-theme-hint-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        .fren-item .fren-name { font-weight: 600; }
+        .fren-item .fren-bonus { font-size: var(--font-size-small); color: var(--success-color); }
+        #frens-list-container { max-height: 400px; overflow-y: auto; padding-right: 5px;} /* For scrollable list */
+        #no-frens-message {
+            text-align: center;
+            color: var(--tg-theme-hint-color);
+            padding: 20px;
+            font-style: italic;
+        }
+        .leaderboard-toggle {
+            text-align: center;
+            margin-bottom: var(--item-spacing);
+        }
+        .leaderboard-toggle button {
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            padding: 8px 15px;
+            border-radius: 20px;
+            margin: 0 5px;
+        }
+        .leaderboard-toggle button.active {
+            background: var(--primary-color);
+            color: var(--button-text-color);
+        }
+
+
+        /* Boosts Page */
+        #page-boosts .boost-item { /* Uses .list-item styles */ }
+        .boost-item .item-description { margin-bottom: 5px; }
+        .boost-item .boost-timer, .boost-item .boost-uses {
+            font-size: var(--font-size-small);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+        .boost-item.active .item-icon {
+            border: 2px solid var(--success-color);
+            box-shadow: 0 0 10px var(--success-color);
+        }
+        .boost-item button:disabled {
+            background-color: var(--tg-theme-hint-color) !important; /* Ensure override */
+        }
+        
+
+        /* Withdraw Page */
+        #page-withdraw .form-group { margin-bottom: var(--item-spacing); }
+        #page-withdraw label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 500; 
+            color: var(--text-color);
+        }
+        #page-withdraw input[type="number"], 
+        #page-withdraw input[type="text"], 
+        #page-withdraw select {
+            width: 100%; /* Full width */
+            padding: 12px 15px;
+            border: 1px solid #ced4da; /* Standard border */
+            border-radius: var(--button-border-radius);
+            font-size: var(--font-size-medium);
+            background-color: var(--background-color); /* Match page bg for better integration */
+            color: var(--text-color);
+            transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+        }
+        #page-withdraw input:focus, #page-withdraw select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem color-mix(in srgb, var(--primary-color) 30%, transparent);
+            outline: none;
+        }
+        #withdraw-message { 
+            margin-top: var(--item-spacing); 
+            text-align:center; 
+            font-weight: 500; 
+            padding: 10px;
+            border-radius: var(--button-border-radius);
+        }
+        #withdraw-message.success { background-color: color-mix(in srgb, var(--success-color) 20%, transparent); color: var(--success-color); }
+        #withdraw-message.error { background-color: color-mix(in srgb, var(--danger-color) 20%, transparent); color: var(--danger-color); }
+        
+        .withdraw-history-title {
+            margin-top: 25px;
+            margin-bottom: 10px;
+            font-size: var(--font-size-large);
+            color: var(--secondary-color);
+        }
+        .history-item {
+            background-color: var(--tg-theme-secondary-bg-color, #f9f9f9);
+            padding: 12px 15px;
+            margin-bottom: 10px;
+            border-radius: var(--button-border-radius);
+            font-size: var(--font-size-small);
+            border: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+        }
+        .history-item .amount { font-weight: bold; color: var(--primary-color); }
+        .history-item .status { font-style: italic; }
+        .history-item .status.pending { color: var(--warning-color); }
+        .history-item .status.completed { color: var(--success-color); }
+        .history-item .status.failed { color: var(--danger-color); }
+
+
+        /* Daily Reward Modal */
+        .modal-overlay {
+            display: none; /* Hidden by default */
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6); /* Darker overlay */
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity var(--transition-medium);
+        }
+        .modal-overlay.show { 
+            display: flex; 
+            opacity: 1;
+        }
+        .modal-content {
+            background-color: var(--card-background);
+            margin: auto;
+            padding: 25px 30px; /* More padding */
+            border-radius: var(--card-border-radius);
+            width: 90%;
+            max-width: 450px;
+            text-align: center;
+            box-shadow: var(--shadow-lg);
+            transform: scale(0.95);
+            opacity: 0;
+            transition: transform var(--transition-medium) cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity var(--transition-medium); /* Pop animation */
+        }
+        .modal-overlay.show .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .modal-content .modal-icon {
+            font-size: 3em;
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            animation: bounceIcon 2s infinite;
+        }
+        @keyframes bounceIcon {
+            0%, 20%, 50%, 80%, 100% {transform: translateY(0);}
+            40% {transform: translateY(-15px);}
+            60% {transform: translateY(-7px);}
+        }
+        .modal-content h2 { 
+            color: var(--primary-color); 
+            margin-top: 0; 
+            margin-bottom: 10px;
+            font-size: var(--font-size-xlarge);
+        }
+        .modal-content p { 
+            margin-bottom: 20px; 
+            font-size: var(--font-size-medium);
+            line-height: 1.5;
+            color: var(--text-color);
+        }
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .modal-actions button {
+            flex-grow: 1;
+        }
+
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-right { text-align: right; }
+        .font-bold { font-weight: bold; }
+        .font-semibold { font-weight: 600; }
+        .text-primary { color: var(--primary-color); }
+        .text-secondary { color: var(--secondary-color); }
+        .text-accent { color: var(--accent-color); }
+        .text-success { color: var(--success-color); }
+        .text-danger { color: var(--danger-color); }
+        .text-hint { color: var(--tg-theme-hint-color); }
+        
+        .mt-1 { margin-top: 10px !important; }
+        .mt-2 { margin-top: 20px !important; }
+        .mt-3 { margin-top: 30px !important; }
+        .mb-1 { margin-bottom: 10px !important; }
+        .mb-2 { margin-bottom: 20px !important; }
+        .mb-3 { margin-bottom: 30px !important; }
+        .p-1 { padding: 10px !important; }
+        .p-2 { padding: 20px !important; }
+
+        .w-100 { width: 100% !important; }
+        .d-none { display: none !important; } /* Use .hidden for consistency */
+        .hidden { display: none !important; }
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        /* Toast Notification */
+        #toast-notification {
+            position: fixed;
+            bottom: calc(var(--nav-height) + 20px); /* Position above nav bar */
+            left: 50%;
+            transform: translateX(-50%) translateY(20px); /* Initial position for animation */
+            background-color: rgba(30,30,30,0.9); /* Dark, slightly transparent */
+            color: white;
+            padding: 14px 22px;
+            border-radius: 25px; /* Pill shape */
+            font-size: var(--font-size-small);
+            font-weight: 500;
+            z-index: 3000;
+            opacity: 0;
+            transition: opacity var(--transition-medium) ease, transform var(--transition-medium) ease;
+            pointer-events: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            max-width: 90%;
+            text-align: center;
+        }
+        #toast-notification.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        #toast-notification.success { background-color: color-mix(in srgb, var(--success-color) 80%, black); }
+        #toast-notification.error { background-color: color-mix(in srgb, var(--danger-color) 80%, black); }
+        #toast-notification.info { background-color: color-mix(in srgb, var(--info-color) 80%, black); }
+
+
+        /* Loading Spinner */
+        .spinner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .spinner-overlay.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid var(--tg-theme-secondary-bg-color);
+            border-top-color: var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Helper for icons in buttons/links */
+        .icon {
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            vertical-align: -0.125em; /* Adjust for better alignment with text */
+            fill: currentColor;
+        }
+
+        /* Prevent selection on non-text elements */
+        #tap-button, .nav-btn {
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+
+        /* Custom scrollbar for webkit browsers (optional, for desktop view) */
+        .content-area::-webkit-scrollbar {
+            width: 8px;
+        }
+        .content-area::-webkit-scrollbar-track {
+            background: var(--background-color);
+        }
+        .content-area::-webkit-scrollbar-thumb {
+            background-color: var(--primary-color);
+            border-radius: 10px;
+            border: 2px solid var(--background-color);
+        }
+
+        /* Styles for improved accessibility */
+        :focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        /* Placeholder for image if it fails to load */
+        img[alt]:after {
+            content: attr(alt);
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #eee;
+            color: #777;
+            font-size: 12px;
+            text-align: center;
+            padding-top: 40%; /* Adjust to center text vertically */
         }
 
     </style>
 </head>
 <body>
-    <div id="app-header">Xot_swap</div>
+    <div id="app-header">
+        <!-- <img src="logo.png" alt="XotSwap" class="header-logo"> -->
+        Xot_swap Power Play
+    </div>
 
     <div class="content-area">
         <!-- Profile Page -->
         <div id="page-profile" class="page">
-            <h2>Profile</h2>
-            <div class="card">
-                <div class="profile-item"><strong>Name:</strong> <span id="profile-name"></span></div>
-                <div class="profile-item"><strong>Current Points:</strong> <span id="profile-points"></span></div>
-                <div class="profile-item"><strong>Joined:</strong> <span id="profile-join-date"></span></div>
-                <div class="profile-item"><strong>Referral Link:</strong> <br><span id="profile-referral-link" style="word-break: break-all;"></span></div>
+            <div class="profile-header card">
+                <div id="profile-avatar">U</div> <!-- Placeholder for user initial or image -->
+                <div id="profile-greeting">
+                    <h2 id="profile-name-greeting">Welcome, Player!</h2>
+                    <p>User ID: <span id="profile-userId"></span></p>
+                </div>
             </div>
-            <div class="text-center" style="margin-top: 20px;">
-                <p>Bot: <a href="https://t.me/xotswap_bot" target="_blank">t.me/xotswap_bot</a></p>
-                <p>Direct WebApp: <a href="http://t.me/xotswap_bot/Xot" target="_blank">t.me/xotswap_bot/Xot</a></p>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3>My Stats</h3>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">💰 Current Points</span>
+                    <span id="profile-points" class="profile-item-value">0</span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">📈 Profit Per Hour</span>
+                    <span id="profile-pph" class="profile-item-value">0</span>
+                </div>
+                 <div class="profile-item">
+                    <span class="profile-item-label">⚡ Max Energy</span>
+                    <span id="profile-max-energy" class="profile-item-value">0</span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">👆 Tap Power</span>
+                    <span id="profile-tap-power" class="profile-item-value">0</span>
+                </div>
+                <div class="profile-item">
+                    <span class="profile-item-label">📅 Joined</span>
+                    <span id="profile-join-date" class="profile-item-value">N/A</span>
+                </div>
+            </div>
+
+            <div class="card" id="profile-referral-link-container">
+                 <div class="card-header">
+                    <h3>Referral Program</h3>
+                </div>
+                <p class="text-hint mb-1">Invite frens and earn bonus points for each fren and their activity!</p>
+                <div id="profile-referral-link" onclick="app.copyReferralLink()">
+                    <span>🎁 Tap to copy your referral link</span>
+                </div>
+            </div>
+            
+            <div class="card text-center">
+                <h3>Game Links</h3>
+                <p class="mt-1">Main Bot: <a href="https://t.me/xotswap_bot" target="_blank" class="text-primary">@xotswap_bot</a></p>
+                <p>Community Channel: <a href="https://t.me/your_channel_link" target="_blank" class="text-primary">Join Us!</a></p>
+                <p>Support: <a href="https://t.me/your_support_link" target="_blank" class="text-primary">Contact Support</a></p>
             </div>
         </div>
 
         <!-- Tap Page -->
         <div id="page-tap" class="page active">
-            <div id="points-display">0</div>
-            <div id="tap-button-container" style="position: relative;"> <!-- Container for tap button and animations -->
-                <div id="tap-button">
-                    <!-- 
-                        Replace this SVG with your desired image.
-                        For a raster image (PNG, JPG, GIF):
-                        <img id="tap-image" src="YOUR_IMAGE_URL_HERE" alt="Tap Me">
-                        Make sure the image is HD and fits well.
-                    -->
-                    <svg id="tap-image" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-                        <!-- Simple Cat SVG - Replace with Hamster or other image -->
-                        <path d="M50 10 C 20 10, 20 40, 20 50 C 20 80, 30 90, 50 90 C 70 90, 80 80, 80 50 C 80 40, 80 10, 50 10 Z M 40 40 Q 45 35, 50 40 Q 55 35, 60 40 Q 55 45, 50 50 Q 45 45, 40 40 Z M 30 60 Q 50 70, 70 60 Q 50 80, 30 60 Z" fill="#FFA500"/>
-                        <circle cx="35" cy="30" r="5" fill="black"/>
-                        <circle cx="65" cy="30" r="5" fill="black"/>
-                        <path d="M45 55 Q50 60 55 55" stroke="black" stroke-width="2" fill="none"/>
-                        <path d="M20 50 A 10 10 0 0 0 10 40 L 10 30 A 5 5 0 0 1 20 30 Z" fill="#FFA500"/>
-                        <path d="M80 50 A 10 10 0 0 1 90 40 L 90 30 A 5 5 0 0 0 80 30 Z" fill="#FFA500"/>
-                    </svg>
+            <div class="tap-header-info">
+                <div id="profit-per-hour-display">PPH: 0</div>
+                <div id="league-display" class="hidden">League: Bronze</div> <!-- Example for future -->
+                <div id="level-display">Level: 1</div>
+            </div>
+
+            <div id="points-display-container">
+                <div id="points-display-icon">X</div> <!-- Coin icon placeholder -->
+                <div id="points-display">0</div>
+            </div>
+
+            <div id="tap-button-container">
+                <div id="tap-button" ontouchstart="app.handleTap(event)" onmousedown="app.handleTap(event)">
+                    <img id="tap-image" src="https://i.ibb.co/9TRgV9k/hamster-placeholder.png" alt="Tap Me Xot">
                 </div>
             </div>
+
             <div id="energy-container">
-                <span>Energy: <span id="energy-text">100/100</span></span>
+                <div id="energy-info">
+                    <span>⚡️ Energy: <span id="energy-text">500/500</span></span>
+                    <button id="boost-full-energy-btn" onclick="app.activateFullEnergyBoost()">
+                        <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" style="margin-right: 5px;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z"></path></svg>
+                        Refill (<span id="full-energy-boosts-left">3</span>)
+                    </button>
+                </div>
                 <div id="energy-bar-bg">
                     <div id="energy-bar-fill"></div>
+                    <!-- <span id="energy-percentage-text">100%</span> -->
                 </div>
+            </div>
+        </div>
+
+        <!-- Upgrades Page -->
+        <div id="page-upgrades" class="page">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Upgrades Center</h2>
+                    <p class="subtitle">Invest your points to boost your earnings and efficiency.</p>
+                </div>
+            </div>
+            <div id="upgrades-list-container">
+                <!-- Upgrade items will be rendered here by JS -->
+            </div>
+        </div>
+
+        <!-- Boosts Page -->
+        <div id="page-boosts" class="page">
+            <div class="card">
+                 <div class="card-header">
+                    <h2>Boosters</h2>
+                    <p class="subtitle">Activate powerful temporary boosts for a massive advantage!</p>
+                </div>
+            </div>
+            <div id="boosts-list-container">
+                <p class="text-center text-hint mt-2">Daily boosters refresh every 24 hours.</p>
+                <!-- Boost items will be rendered here by JS -->
             </div>
         </div>
 
         <!-- Task Page -->
         <div id="page-task" class="page">
-            <h2>Tasks</h2>
-            <ul id="task-list" class="task-list">
-                <!-- Tasks will be rendered here by JS -->
-            </ul>
+            <div class="card">
+                <div class="card-header">
+                    <h2>Tasks & Rewards</h2>
+                    <p class="subtitle">Complete tasks to earn bonus points and special rewards.</p>
+                </div>
+            </div>
+            <div id="task-categories">
+                <!-- Task categories and lists will be rendered here by JS -->
+            </div>
+        </div>
+        
+        <!-- Frens Page -->
+        <div id="page-frens" class="page">
+            <div class="card frens-header">
+                <div class="card-header">
+                    <h2>Frens & Referrals</h2>
+                    <p class="subtitle">Invite your frens and earn together!</p>
+                </div>
+                <p class="invite-bonus">🎁 You get <strong id="fren-invite-bonus">1,000</strong> points for each fren!</p>
+                <p class="invite-bonus">🤝 Your fren gets <strong id="fren-welcome-bonus">500</strong> points as a welcome gift!</p>
+                <button class="primary-btn mt-2" onclick="app.inviteFren()">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+                    Invite a Fren
+                </button>
+            </div>
+
+            <div class="card">
+                 <div class="card-header">
+                    <h3>Your Frens (<span id="frens-count">0</span>)</h3>
+                </div>
+                <div id="frens-list-container">
+                    <ul id="frens-list" class="list-unstyled">
+                        <!-- Frens will be rendered here by JS -->
+                    </ul>
+                    <p id="no-frens-message" class="hidden">You haven't invited any frens yet. Tap the button above to start!</p>
+                </div>
+            </div>
+
+             <div class="card leaderboard-toggle hidden"> <!-- Placeholder for leaderboard -->
+                <button class="active" data-type="frens">My Frens</button>
+                <button data-type="global">Global Top</button>
+            </div>
         </div>
 
-        <!-- Withdraw Page -->
+
+        <!-- Withdraw Page (Conceptual - Full functionality requires backend) -->
         <div id="page-withdraw" class="page">
-            <h2>Withdraw Points</h2>
             <div class="card">
+                <div class="card-header">
+                    <h2>Withdraw Points</h2>
+                    <p class="subtitle">Convert your in-game points. (Feature under development)</p>
+                </div>
                 <div class="form-group">
                     <label for="withdraw-amount">Amount to Withdraw:</label>
-                    <input type="number" id="withdraw-amount" placeholder="Enter points">
+                    <input type="number" id="withdraw-amount" placeholder="Enter points (e.g., 100000)">
                 </div>
                 <div class="form-group">
                     <label for="withdraw-method">Withdrawal Method:</label>
                     <select id="withdraw-method">
-                        <option value="paypal">PayPal</option>
-                        <option value="bank">Wire Transfer</option>
-                        <option value="crypto">Crypto (USDT)</option>
+                        <option value="ton_usdt">USDT (TON Network)</option>
+                        <option value="xot_token" disabled>XOT Token (Coming Soon)</option>
+                        <option value="paypal" disabled>PayPal (Coming Soon)</option>
                     </select>
                 </div>
-                <button id="withdraw-btn">Withdraw</button>
-                <p id="withdraw-message" style="margin-top:10px; text-align:center;"></p>
+                <div class="form-group">
+                    <label for="withdraw-address">Wallet Address (for USDT TON):</label>
+                    <input type="text" id="withdraw-address" placeholder="Enter your TON wallet address">
+                </div>
+                <button id="submit-withdraw-btn" class="primary-btn mt-2" onclick="app.handleWithdrawRequest()">
+                    Request Withdraw
+                </button>
+                <div id="withdraw-message" class="mt-2"></div>
             </div>
-            <div id="withdraw-history" class="card">
-                <h3>Withdrawal History (Mock)</h3>
-                <ul id="history-list" style="list-style:none; padding:0;">
-                    <!-- History items will be added here -->
+
+            <div class="card">
+                <h3 class="withdraw-history-title">Withdrawal History</h3>
+                <ul id="withdraw-history-list" class="list-unstyled">
+                    <!-- History items will be rendered by JS -->
+                     <li class="history-item">
+                        <div>100,000 Points to USDT TON<br><small class="text-hint">Date: 2024-07-28</small></div>
+                        <div class="status pending">Pending</div>
+                    </li>
+                     <li class="history-item">
+                        <div>50,000 Points to XOT<br><small class="text-hint">Date: 2024-07-25</small></div>
+                        <div class="status completed">Completed</div>
+                    </li>
                 </ul>
+                <p id="no-withdraw-history" class="text-hint text-center mt-1 hidden">No withdrawal history yet.</p>
             </div>
         </div>
     </div>
 
-    <nav id="bottom-nav">
+    <div id="bottom-nav">
         <button class="nav-btn" data-page="page-profile">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M12,5A3,3 0 0,1 15,8A3,3 0 0,1 12,11A3,3 0 0,1 9,8A3,3 0 0,1 12,5M12,19.2C9.5,19.2 7.29,17.92 6,15.98C6.03,13.98 10,12.9 12,12.9C14,12.9 17.97,13.98 18,15.98C16.71,17.92 14.5,19.2 12,19.2Z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
             Profile
         </button>
         <button class="nav-btn active" data-page="page-tap">
-             <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M11,6H13V13H16L12,17L8,13H11V6M12,20C7.59,20 4,16.41 4,12H6A6,6 0 0,1 12,18A6,6 0 0,1 18,12H20C20,16.41 16.41,20 12,20Z" /></svg>
+             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12.34 2.34C11.15 2.06 10.03 2 9 2c-2.21 0-4.21.49-5.98 1.35C1.26 4.23 0 6.04 0 8v10c0 1.1.9 2 2 2h7c1.73 0 3.33-.43 4.72-1.21.32-.18.58-.49.71-.85.13-.36.03-.77-.23-1.06l-4.1-4.56c-.35-.38-.86-.46-1.3-.21l-1.31.73c-.2.11-.45.02-.56-.19L6.38 12H4V9.77L8.8 8.33c.38-.12.67-.44.67-.83s-.29-.71-.67-.83L4 5.23V4c0-1.1.9-2 2-2h3.34c.47 0 .93.12 1.33.34l5.83 3.24c.38.21.67.61.67 1.05V14c0 .99-.57 1.85-1.4 2.23-.32.14-.5.48-.5.83v.94c0 1.1.9 2 2 2h3c1.1 0 2-.9 2-2V8c0-1.96-1.26-3.77-3.02-4.65C16.79 2.49 14.79 2 13 2c-.34 0-.67.02-1 .06l-.66.28z"/></svg>
             Tap
         </button>
+        <button class="nav-btn" data-page="page-upgrades">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3M3 13.5h2.5L9 17.2V22h6v-4.8l3.5-3.7H21V9h-2.5L15 5.3V0H9v5.3L5.5 9H3v4.5M10 2v3.3L6.8 8.5H4V10h2.67L10 13.67V16h4v-2.33L17.33 10H20V8.5h-2.8L14 5.3V2h-4m2 5c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5Z"/></svg>
+            Upgrades
+        </button>
+        <button class="nav-btn" data-page="page-boosts">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L9.14 8.11 2 9.82l5.54 5.07L6.28 22 12 18.61 17.72 22l-1.28-7.11L22 9.82l-7.14-1.71L12 2zm0 3.37L13.92 10h4.94l-3.99 3.64 1.48 5.3L12 16.47l-4.35 2.84 1.48-5.3L4.14 10h4.94L12 5.37z"/></svg>
+            Boosts
+        </button>
         <button class="nav-btn" data-page="page-task">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20M12,13L14.5,15.5L12,18L9.5,15.5L12,13M8,5V7H11V5H8Z" /></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
             Tasks
         </button>
-        <button class="nav-btn" data-page="page-withdraw">
-            <svg viewBox="0 0 24 24"><path fill="currentColor" d="M3,6H21V8H3V6M3,11H21V13H3V11M3,16H21V18H3V16Z" /></svg>
-            Withdraw
+        <button class="nav-btn" data-page="page-frens">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/></svg>
+            Frens
         </button>
-    </nav>
+        <!-- <button class="nav-btn" data-page="page-withdraw">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M5 4h14v2H5zm0 10h4v6h6v-6h4l-7-7-7 7z"/></svg>
+            Withdraw
+        </button> -->
+    </div>
+
+    <!-- Daily Reward Modal -->
+    <div id="daily-reward-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon">🎁</div>
+            <h2>Daily Reward!</h2>
+            <p id="daily-reward-message">Welcome back! Claim your daily reward of <strong id="daily-reward-amount">1000</strong> points!</p>
+            <div class="modal-actions">
+                <button class="primary-btn" id="claim-daily-reward-btn" onclick="app.claimDailyReward()">Claim Now</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generic Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-icon" id="confirmation-modal-icon">❓</div>
+            <h2 id="confirmation-modal-title">Confirm Action</h2>
+            <p id="confirmation-modal-message">Are you sure you want to proceed?</p>
+            <div class="modal-actions">
+                <button class="secondary-btn" id="confirmation-modal-cancel-btn">Cancel</button>
+                <button class="primary-btn" id="confirmation-modal-confirm-btn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Toast Notification -->
+    <div id="toast-notification">Toast message goes here</div>
+
+    <!-- Loading Spinner Overlay -->
+    <div id="loading-overlay" class="spinner-overlay">
+        <div class="spinner"></div>
+    </div>
 
     <script>
-        // Attempt to use Telegram WebApp SDK for user data
-        const tg = window.Telegram?.WebApp;
-        
-        const app = {
-            userData: {
-                userName: "Guest",
-                userId: null, // Store Telegram user ID if available
-                joiningDate: new Date().toISOString(),
-                points: 0,
-                energy: 100,
-                maxEnergy: 500, // Initial max energy
-                energyPerTap: 1,   // Energy consumed per tap
-                pointsPerTap: 1,   // Points gained per tap
-                energyRegenRate: 1, // Energy points per second
-                lastEnergyUpdate: Date.now(),
-                tasks: [
-                    { id: "yt1", name: "Watch Tech Review 📺", reward: 1000, completed: false, url: "https://www.youtube.com/embed/M7lc1qf-
-                    ms" }, // Example: MKBHD video
-                    { id: "yt2", name: "Learn Coding Basics 💻", reward: 1000, completed: false, url: "https://www.youtube.com/embed/zOjov-2OZ0E" }, // Example: FreeCodeCamp video
-                    { id: "yt3", name: "SpaceX Starship Update 🚀", reward: 1000, completed: false, url: "https://www.youtube.com/embed/uRk339ablko" }, // Example: SpaceX video
-                    { id: "yt4", name: "Funny Cat Compilation 😹", reward: 1000, completed: false, url: "https://www.youtube.com/embed/short-funny-cats" }, // Example: Placeholder for generic cat video
-                    { id: "yt5", name: "Travel Vlog: Japan 🌸", reward: 1000, completed: false, url: "https://www.youtube.com/embed/Iaoy3QEJ9n8" } // Example: Travel vlog
-                ],
-                referralLink: "t.me/xotswap_bot?start=REF_PLACEHOLDER",
-                withdrawals: []
-            },
-            config: {
-                localStorageKey: 'xotSwapData_v1' // Versioning for easier future migrations
-            },
+    // Strict mode for better error handling and performance
+    'use strict';
 
-            init: function() {
-                if (tg) {
-                    tg.ready(); // Inform Telegram an app is ready
-                    tg.expand(); // Expand the webapp to full height
-                    // Use actual Telegram user data if available
+    /**
+     * Xot_swap Power Play - Main Application Logic
+     * Version: 1.0.0
+     * Author: XotSwap Team
+     * Description: Core JavaScript for the Telegram Web App.
+     */
+
+    const app = {
+        // --- Constants & Configuration ---
+        config: {
+            appName: "Xot_swap Power Play",
+            version: "1.0.0",
+            defaultEnergy: 500,
+            energyPerTap: 1, // Configurable: can be upgraded
+            energyRechargeRate: 1, // Energy points per second
+            pointsPerTap: 1, // Configurable: can be upgraded
+            offlineEarningsMultiplier: 0.2, // 20% of PPH
+            maxOfflineHours: 6, // Max hours for offline earnings
+            dailyRewardBase: 1000,
+            fullEnergyBoostsDaily: 3,
+            frenInviteBonus: 1000,
+            frenWelcomeBonus: 500,
+            tapImage: 'https://i.ibb.co/9TRgV9k/hamster-placeholder.png', // Default tap image
+            localStoragePrefix: 'xotswap_powerplay_',
+            debugMode: false, // Set to true for console logs
+        },
+
+        // --- Game State Variables ---
+        state: {
+            currentPage: 'page-tap',
+            points: 0,
+            level: 1,
+            maxEnergy: 0, // Will be set by upgrades or default
+            currentEnergy: 0,
+            tapPower: 0, // Will be set by upgrades or default
+            profitPerHour: 0,
+            lastEnergyUpdateTime: Date.now(),
+            lastLoginTime: Date.now(),
+            dailyRewardClaimedTime: 0,
+            fullEnergyBoostsUsedToday: 0,
+            fullEnergyBoostsLastReset: 0,
+            upgrades: {}, // { upgradeId: level }
+            tasksCompleted: {}, // { taskId: true }
+            frens: [], // [{id: 'xxx', name: 'Fren Name', bonusClaimed: true}]
+            userProfile: {
+                id: null,
+                firstName: 'Player',
+                lastName: '',
+                username: 'player',
+                photoUrl: null,
+                joinDate: new Date().toISOString().split('T')[0]
+            },
+            settings: {
+                hapticsEnabled: true,
+                soundEnabled: false, // Future feature
+            },
+            // Game Data - normally from a server, here hardcoded or in localStorage
+            availableUpgrades: [],
+            availableTasks: [],
+            availableBoosts: [],
+        },
+
+        // --- DOM Element Cache ---
+        elements: {},
+
+        // --- Initialization ---
+        init: function() {
+            this.log("App Initializing...");
+            this.setupTelegramWebApp();
+            this.cacheDOMElements();
+            this.loadGameState(); // Load game state first
+            this.initializeGameData(); // Then initialize game definitions (upgrades, tasks)
+            this.bindEventListeners();
+            this.updateAllUI();
+            this.startEnergyRechargeCycle();
+            this.navigateToPage(this.state.currentPage, true); // Navigate to last or default page
+            this.checkDailyReward();
+            this.calculateOfflineEarnings();
+            this.checkDailyBoostReset();
+            
+            // Set dynamic viewport height
+            const setVh = () => {
+                document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+            };
+            window.addEventListener('resize', setVh);
+            setVh(); // Initial call
+
+            this.log("App Initialization Complete.");
+            this.hideLoadingOverlay();
+        },
+
+        setupTelegramWebApp: function() {
+            try {
+                if (window.Telegram && window.Telegram.WebApp) {
+                    const tg = window.Telegram.WebApp;
+                    tg.ready();
+                    tg.expand(); // Expand the Web App to full height
+                    
+                    // Apply Telegram theme
+                    if (tg.themeParams) {
+                        this.applyTheme(tg.themeParams);
+                    }
+                    tg.onEvent('themeChanged', () => this.applyTheme(tg.themeParams));
+
+                    // User data
                     if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
                         const user = tg.initDataUnsafe.user;
-                        this.userData.userName = user.first_name + (user.last_name ? ' ' + user.last_name : '') || user.username || "Telegram User";
-                        this.userData.userId = user.id;
-                        this.userData.referralLink = `https://t.me/xotswap_bot?start=${user.id}`;
+                        this.state.userProfile.id = user.id;
+                        this.state.userProfile.firstName = user.first_name || 'Player';
+                        this.state.userProfile.lastName = user.last_name || '';
+                        this.state.userProfile.username = user.username || `user${user.id}`;
+                        this.state.userProfile.photoUrl = user.photo_url || null;
+                         this.log("Telegram user data loaded:", this.state.userProfile);
+                    } else {
+                        this.log("Telegram user data not available. Using defaults.");
+                        // Generate a mock user ID if not in Telegram env for testing
+                        this.state.userProfile.id = this.state.userProfile.id || `mock_${Date.now()}`;
                     }
+
+                    // Handle back button (optional, if you want to control navigation)
+                    // tg.BackButton.onClick(() => this.handleBackButton());
+                    // tg.BackButton.show(); // if you want to use it
+                } else {
+                    this.log("Telegram WebApp script not loaded. Running in standalone mode.");
+                     this.state.userProfile.id = this.state.userProfile.id || `standalone_${Date.now()}`;
+                }
+            } catch (error) {
+                this.error("Error setting up Telegram WebApp:", error);
+            }
+        },
+        
+        applyTheme: function(themeParams) {
+            this.log("Applying Telegram theme:", themeParams);
+            const root = document.documentElement;
+            if (themeParams.bg_color) root.style.setProperty('--tg-theme-bg-color', themeParams.bg_color);
+            if (themeParams.text_color) root.style.setProperty('--tg-theme-text-color', themeParams.text_color);
+            if (themeParams.hint_color) root.style.setProperty('--tg-theme-hint-color', themeParams.hint_color);
+            if (themeParams.link_color) root.style.setProperty('--tg-theme-link-color', themeParams.link_color);
+            if (themeParams.button_color) root.style.setProperty('--tg-theme-button-color', themeParams.button_color);
+            if (themeParams.button_text_color) root.style.setProperty('--tg-theme-button-text-color', themeParams.button_text_color);
+            if (themeParams.secondary_bg_color) root.style.setProperty('--tg-theme-secondary-bg-color', themeParams.secondary_bg_color);
+            // Potentially update specific elements if needed, e.g. header color
+        },
+
+        cacheDOMElements: function() {
+            this.log("Caching DOM elements...");
+            this.elements = {
+                // App Structure
+                appHeader: document.getElementById('app-header'),
+                contentArea: document.querySelector('.content-area'),
+                bottomNav: document.getElementById('bottom-nav'),
+                navButtons: document.querySelectorAll('.nav-btn'),
+                loadingOverlay: document.getElementById('loading-overlay'),
+
+                // Pages
+                pages: document.querySelectorAll('.page'),
+                pageTap: document.getElementById('page-tap'),
+                pageProfile: document.getElementById('page-profile'),
+                pageUpgrades: document.getElementById('page-upgrades'),
+                pageTask: document.getElementById('page-task'),
+                pageFrens: document.getElementById('page-frens'),
+                pageBoosts: document.getElementById('page-boosts'),
+                pageWithdraw: document.getElementById('page-withdraw'),
+
+                // Tap Page Elements
+                pointsDisplay: document.getElementById('points-display'),
+                pointsDisplayIcon: document.getElementById('points-display-icon'),
+                tapButton: document.getElementById('tap-button'),
+                tapButtonContainer: document.getElementById('tap-button-container'),
+                tapImage: document.getElementById('tap-image'),
+                energyText: document.getElementById('energy-text'),
+                energyBarFill: document.getElementById('energy-bar-fill'),
+                profitPerHourDisplay: document.getElementById('profit-per-hour-display'),
+                levelDisplay: document.getElementById('level-display'),
+                boostFullEnergyBtn: document.getElementById('boost-full-energy-btn'),
+                fullEnergyBoostsLeftDisplay: document.getElementById('full-energy-boosts-left'),
+
+                // Profile Page Elements
+                profileNameGreeting: document.getElementById('profile-name-greeting'),
+                profileUserId: document.getElementById('profile-userId'),
+                profilePoints: document.getElementById('profile-points'),
+                profilePph: document.getElementById('profile-pph'),
+                profileMaxEnergy: document.getElementById('profile-max-energy'),
+                profileTapPower: document.getElementById('profile-tap-power'),
+                profileJoinDate: document.getElementById('profile-join-date'),
+                profileAvatar: document.getElementById('profile-avatar'),
+                profileReferralLink: document.getElementById('profile-referral-link'),
+
+                // Upgrades Page Elements
+                upgradesListContainer: document.getElementById('upgrades-list-container'),
+
+                // Boosts Page Elements
+                boostsListContainer: document.getElementById('boosts-list-container'),
+                
+                // Task Page Elements
+                taskListContainer: document.getElementById('task-list'), // Assuming top level container for all tasks
+                taskCategoriesContainer: document.getElementById('task-categories'),
+
+
+                // Frens Page Elements
+                frensList: document.getElementById('frens-list'),
+                frensCountDisplay: document.getElementById('frens-count'),
+                noFrensMessage: document.getElementById('no-frens-message'),
+                frenInviteBonusDisplay: document.getElementById('fren-invite-bonus'),
+                frenWelcomeBonusDisplay: document.getElementById('fren-welcome-bonus'),
+
+                // Withdraw Page Elements
+                withdrawAmountInput: document.getElementById('withdraw-amount'),
+                withdrawMethodSelect: document.getElementById('withdraw-method'),
+                withdrawAddressInput: document.getElementById('withdraw-address'),
+                submitWithdrawBtn: document.getElementById('submit-withdraw-btn'),
+                withdrawMessage: document.getElementById('withdraw-message'),
+                withdrawHistoryList: document.getElementById('withdraw-history-list'),
+                noWithdrawHistoryMessage: document.getElementById('no-withdraw-history'),
+
+                // Modals
+                dailyRewardModal: document.getElementById('daily-reward-modal'),
+                dailyRewardMessage: document.getElementById('daily-reward-message'),
+                dailyRewardAmount: document.getElementById('daily-reward-amount'),
+                claimDailyRewardBtn: document.getElementById('claim-daily-reward-btn'),
+                confirmationModal: document.getElementById('confirmation-modal'),
+                confirmationModalIcon: document.getElementById('confirmation-modal-icon'),
+                confirmationModalTitle: document.getElementById('confirmation-modal-title'),
+                confirmationModalMessage: document.getElementById('confirmation-modal-message'),
+                confirmationModalCancelBtn: document.getElementById('confirmation-modal-cancel-btn'),
+                confirmationModalConfirmBtn: document.getElementById('confirmation-modal-confirm-btn'),
+
+
+                // Toast Notification
+                toastNotification: document.getElementById('toast-notification'),
+            };
+            this.log("DOM elements cached.");
+        },
+
+        bindEventListeners: function() {
+            this.log("Binding event listeners...");
+            // Navigation
+            this.elements.navButtons.forEach(btn => {
+                btn.addEventListener('click', () => this.navigateToPage(btn.dataset.page));
+            });
+
+            // Tap button - event already on element for touchstart for responsiveness
+            // this.elements.tapButton.addEventListener('click', (e) => this.handleTap(e)); // Fallback for mouse
+
+            // Full Energy Boost
+            this.elements.boostFullEnergyBtn.addEventListener('click', () => this.activateFullEnergyBoost());
+            
+            // Daily Reward Modal
+            this.elements.claimDailyRewardBtn.addEventListener('click', () => this.claimDailyReward());
+            
+            // Confirmation Modal
+            this.elements.confirmationModalCancelBtn.addEventListener('click', () => this.hideConfirmationModal());
+
+            // Stop propagation for modals to prevent closing when clicking inside
+            [this.elements.dailyRewardModal, this.elements.confirmationModal].forEach(modal => {
+                if(modal.querySelector('.modal-content')) {
+                    modal.querySelector('.modal-content').addEventListener('click', e => e.stopPropagation());
+                }
+                modal.addEventListener('click', () => { // Close on overlay click
+                    if (modal.id === 'daily-reward-modal' && this.elements.claimDailyRewardBtn.disabled) {
+                        // Don't close if reward already claimed and modal is just informational
+                    } else if (modal.id === 'confirmation-modal') {
+                        // Allow confirmation modal to be closed by overlay click
+                        this.hideConfirmationModal();
+                    } else {
+                         modal.classList.remove('show');
+                    }
+                });
+            });
+
+
+            // Prevent double tap zoom on tap button for iOS
+            if (this.elements.tapButton) {
+                this.elements.tapButton.addEventListener('touchend', function(event) {
+                    event.preventDefault(); 
+                    // We call handleTap on touchstart, so touchend is just for prevention here
+                }, { passive: false });
+            }
+
+            // Save game state on window unload (might not always work reliably on mobile)
+            window.addEventListener('beforeunload', () => this.saveGameState());
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'hidden') {
+                    this.saveGameState();
+                } else if (document.visibilityState === 'visible') {
+                    this.loadGameState(); // Or just parts of it, like energy
+                    this.lastEnergyUpdateTime = Date.now(); // Reset energy update time
+                    this.checkDailyReward();
+                    this.checkDailyBoostReset();
+                }
+            });
+            this.log("Event listeners bound.");
+        },
+        
+        // --- Game Data Initialization ---
+        initializeGameData: function() {
+            this.log("Initializing game data (upgrades, tasks, boosts)...");
+            // Define Upgrades
+            this.state.availableUpgrades = [
+                { 
+                    id: 'multitap', name: 'Multi-Tap Glove', category: 'Tap', icon: '👆',
+                    description: 'Increases points earned per tap.',
+                    baseCost: 50, costMultiplier: 1.8, baseEffect: 1, effectIncrement: 1, maxLevel: 20 
+                },
+                { 
+                    id: 'energyLimit', name: 'Energy Cap', category: 'Energy', icon: '🔋',
+                    description: 'Increases your maximum energy.',
+                    baseCost: 100, costMultiplier: 2.0, baseEffect: this.config.defaultEnergy, effectIncrement: 100, maxLevel: 15
+                },
+                { 
+                    id: 'energyRecharge', name: 'Recharge Speed', category: 'Energy', icon: '⚡️',
+                    description: 'Increases energy recharge rate (per second).',
+                    baseCost: 250, costMultiplier: 2.2, baseEffect: this.config.energyRechargeRate, effectIncrement: 1, maxLevel: 10
+                },
+                { 
+                    id: 'profitPerHourPassive', name: 'Hourly Earnings', category: 'Passive', icon: '⏰',
+                    description: 'Increases your passive profit per hour (PPH).',
+                    baseCost: 1000, costMultiplier: 1.9, baseEffect: 0, effectIncrement: 100, maxLevel: 25
+                },
+                // Add more upgrades...
+                {
+                    id: 'offlineBonus', name: 'Offline Bonus', category: 'Passive', icon: '💤',
+                    description: 'Increases earnings while you are away.',
+                    baseCost: 5000, costMultiplier: 2.5, baseEffect: this.config.offlineEarningsMultiplier, effectIncrement: 0.05, maxLevel: 10 // 0.05 means +5%
+                }
+            ];
+
+            // Define Tasks (example structure)
+            this.state.availableTasks = [
+                {
+                    category: 'Daily Tasks',
+                    tasks: [
+                        { id: 'dailyLogin', name: 'Daily Check-in', icon: '📅', description: 'Log in daily for a bonus.', reward: 500, type: 'daily', actionText: 'Claimed', isCompleted: () => this.isDailyTaskCompleted('dailyLogin') },
+                        { id: 'tap100', name: 'Tap 100 Times', icon: '🖐️', description: 'Perform 100 taps today.', reward: 250, type: 'daily_counter', target: 100, counterKey: 'dailyTaps', actionText: 'Go Tap!', checkCompletion: () => this.getDailyCounter('dailyTaps') >= 100 },
+                    ]
+                },
+                {
+                    category: 'Social Tasks',
+                    tasks: [
+                        { id: 'joinTelegram', name: 'Join Community', icon: '📢', description: 'Join our Telegram channel.', reward: 1000, type: 'external', link: 'https://t.me/your_channel_link', actionText: 'Join', verification: 'manual' },
+                        { id: 'inviteFren', name: 'Invite a Friend', icon: '🧑‍🤝‍🧑', description: 'Invite one friend to the game.', reward: 2000, type: 'game_event', eventKey: 'frenInvited', actionText: 'Invite', checkCompletion: () => this.state.frens.length > 0 },
+                    ]
+                },
+                {
+                    category: 'Special Tasks',
+                    tasks: [
+                        { id: 'reachLevel5', name: 'Reach Level 5', icon: '⭐', description: 'Achieve player level 5.', reward: 5000, type: 'game_milestone', checkCompletion: () => this.state.level >= 5, actionText: 'In Progress' },
+                        { id: 'firstUpgrade', name: 'First Upgrade', icon: '🛠️', description: 'Buy your first upgrade.', reward: 300, type: 'game_milestone', checkCompletion: () => Object.keys(this.state.upgrades).length > 0, actionText: 'Upgrade!' },
+                    ]
+                }
+            ];
+            
+            // Define Boosts (example structure)
+            this.state.availableBoosts = [
+                { 
+                    id: 'fullEnergy', name: 'Full Energy Refill', icon: '⛽',
+                    description: `Instantly refills your energy bar. ${this.config.fullEnergyBoostsDaily} uses per day.`,
+                    type: 'daily_limited', usesPerDay: this.config.fullEnergyBoostsDaily,
+                    cost: 0, // Free, but limited uses
+                    action: () => this.activateFullEnergyBoost(true), // true indicates it's from the boost page
+                    getUsesLeft: () => this.config.fullEnergyBoostsDaily - this.state.fullEnergyBoostsUsedToday,
+                    buttonText: (usesLeft) => `Refill (${usesLeft})`
+                },
+                {
+                    id: 'turboTap', name: 'Turbo Tap (x3)', icon: '🚀',
+                    description: 'Triples your tap power for 30 seconds. 1 use per day.',
+                    type: 'daily_timed', duration: 30000, // 30 seconds
+                    cost: 0, // Or could cost points
+                    usesPerDay: 1,
+                    action: () => this.activateTurboTapBoost(),
+                    getUsesLeft: () => 1 - (this.state.activeBoosts && this.state.activeBoosts.turboTap && this.state.activeBoosts.turboTap.usedToday ? 1:0),
+                    buttonText: (usesLeft) => usesLeft > 0 ? 'Activate' : 'Used'
+                },
+                // Add more boosts...
+            ];
+            
+            // Initialize default levels for upgrades if not in state
+            this.state.availableUpgrades.forEach(upg => {
+                if (this.state.upgrades[upg.id] === undefined) {
+                    this.state.upgrades[upg.id] = 0; // Level 0 for unpurchased upgrades
+                }
+            });
+
+            // Set initial derived stats based on upgrades
+            this.updateDerivedStats();
+            this.log("Game data initialized.");
+        },
+
+        // --- Game Logic ---
+        handleTap: function(event) {
+            // Prevent default for touch events to avoid issues like double tap zoom or unwanted scrolling
+            if (event.type === 'touchstart') {
+                event.preventDefault();
+            }
+            // For mouse clicks, ensure it's the primary button (left click)
+            if (event.type === 'mousedown' && event.button !== 0) {
+                return;
+            }
+            
+            if (this.state.currentEnergy >= this.config.energyPerTap) {
+                this.state.currentEnergy -= this.config.energyPerTap;
+                const pointsEarned = this.state.tapPower;
+                this.state.points += pointsEarned;
+
+                this.updatePointsDisplay();
+                this.updateEnergyDisplay();
+                this.animateTapScore(pointsEarned, event);
+                if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.impactOccurred('light');
+                }
+                
+                // Track daily taps for tasks
+                this.incrementDailyCounter('dailyTaps');
+
+            } else {
+                this.showToast("Not enough energy!", "error");
+                 if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('warning');
+                }
+            }
+        },
+        
+        animateTapScore: function(score, event) {
+            const scoreText = document.createElement('div');
+            scoreText.className = 'tap-score-animation';
+            scoreText.textContent = `+${this.formatNumber(score)}`;
+            
+            this.elements.tapButtonContainer.appendChild(scoreText);
+
+            // Position based on tap location
+            const rect = this.elements.tapButtonContainer.getBoundingClientRect();
+            let clientX, clientY;
+
+            if (event.touches && event.touches.length > 0) {
+                clientX = event.touches[0].clientX;
+                clientY = event.touches[0].clientY;
+            } else {
+                clientX = event.clientX;
+                clientY = event.clientY;
+            }
+            
+            const x = clientX - rect.left - (scoreText.offsetWidth / 2);
+            const y = clientY - rect.top - (scoreText.offsetHeight / 2) - 20; // Start slightly above tap point
+
+            scoreText.style.left = `${x + (Math.random() * 40 - 20)}px`; // Add some randomness
+            scoreText.style.top = `${y + (Math.random() * 20 - 10)}px`;
+
+            setTimeout(() => {
+                scoreText.remove();
+            }, 1150); // Animation duration is 1.2s
+        },
+
+        startEnergyRechargeCycle: function() {
+            setInterval(() => {
+                const now = Date.now();
+                const elapsedSeconds = Math.floor((now - this.state.lastEnergyUpdateTime) / 1000);
+
+                if (elapsedSeconds > 0 && this.state.currentEnergy < this.state.maxEnergy) {
+                    const energyToRecharge = elapsedSeconds * this.getUpgradeEffect('energyRecharge', this.config.energyRechargeRate);
+                    this.state.currentEnergy = Math.min(this.state.maxEnergy, this.state.currentEnergy + energyToRecharge);
+                    this.updateEnergyDisplay();
+                }
+                this.state.lastEnergyUpdateTime = now;
+                // Also save game state periodically
+                 this.saveGameState(); 
+            }, 1000); // Check every second
+        },
+        
+        activateFullEnergyBoost: function(fromBoostPage = false) {
+            if (this.state.fullEnergyBoostsUsedToday < this.config.fullEnergyBoostsDaily) {
+                this.state.currentEnergy = this.state.maxEnergy;
+                this.state.fullEnergyBoostsUsedToday++;
+                this.updateEnergyDisplay();
+                this.updateFullEnergyBoostButton();
+                this.showToast("Energy refilled!", "success");
+                if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                }
+                // If called from boosts page, re-render boosts
+                if (fromBoostPage) this.renderBoostsPage();
+            } else {
+                this.showToast("No energy refills left today.", "error");
+            }
+        },
+
+        calculateProfitPerHour: function() {
+            // PPH is primarily from 'profitPerHourPassive' upgrade
+            const basePPH = this.getUpgradeEffect('profitPerHourPassive', 0);
+            // Could add other factors here, e.g., frens bonus, league bonus etc.
+            this.state.profitPerHour = basePPH;
+            return this.state.profitPerHour;
+        },
+
+        calculateOfflineEarnings: function() {
+            const now = Date.now();
+            const timeOfflineMs = now - this.state.lastLoginTime;
+            const maxOfflineMs = this.config.maxOfflineHours * 60 * 60 * 1000;
+            const effectiveOfflineMs = Math.min(timeOfflineMs, maxOfflineMs);
+            
+            if (effectiveOfflineMs <= 60000) { // Less than a minute, don't bother
+                this.state.lastLoginTime = now;
+                this.saveGameState();
+                return;
+            }
+
+            const hoursOffline = effectiveOfflineMs / (1000 * 60 * 60);
+            const pph = this.state.profitPerHour > 0 ? this.state.profitPerHour : 10; // Minimum PPH for calculation if 0
+            const offlineMultiplier = this.getUpgradeEffect('offlineBonus', this.config.offlineEarningsMultiplier);
+            
+            const earnings = Math.floor(pph * hoursOffline * offlineMultiplier);
+
+            if (earnings > 0) {
+                this.state.points += earnings;
+                this.updatePointsDisplay();
+                this.showToast(`Welcome back! You earned ${this.formatNumber(earnings)} points while away.`, "info", 5000);
+            }
+            this.state.lastLoginTime = now; // Update last login time
+            this.saveGameState();
+        },
+
+        // --- Upgrades Logic ---
+        getUpgradeCost: function(upgrade) {
+            const level = this.state.upgrades[upgrade.id] || 0;
+            if (level >= upgrade.maxLevel) return Infinity; // Max level reached
+            return Math.floor(upgrade.baseCost * Math.pow(upgrade.costMultiplier, level));
+        },
+
+        getUpgradeEffect: function(upgradeId, defaultValueIfNotFound = 0) {
+            const upgrade = this.state.availableUpgrades.find(u => u.id === upgradeId);
+            if (!upgrade) return defaultValueIfNotFound;
+            const level = this.state.upgrades[upgradeId] || 0;
+            if (level === 0 && upgrade.id !== 'multitap' && upgrade.id !== 'energyRecharge') { // For some, level 0 means base value
+                 // For multitap and energyRecharge, level 0 should use config default
+                 if(upgrade.id === 'multitap') return this.config.pointsPerTap;
+                 if(upgrade.id === 'energyRecharge') return this.config.energyRechargeRate;
+                 // For others, if baseEffect is not 0, it means it's the starting value
+                 if(upgrade.baseEffect !== 0 && upgrade.id === 'energyLimit') return this.config.defaultEnergy; // Special for energyLimit
+                 return upgrade.baseEffect; // Usually 0 for PPH like upgrades if unbought
+            }
+            // For energyLimit, baseEffect is the initial default energy. effectIncrement adds to this.
+            // For multitap, baseEffect is 1, increment is 1. Level 0 means 1 tap.
+            let effect = upgrade.baseEffect;
+            if (level > 0) {
+                 effect = upgrade.baseEffect + (upgrade.effectIncrement * level);
+            }
+             // Special handling for energyLimit, which should start at defaultEnergy
+            if (upgrade.id === 'energyLimit' && level === 0) {
+                effect = this.config.defaultEnergy;
+            } else if (upgrade.id === 'energyLimit' && level > 0) {
+                effect = this.config.defaultEnergy + (upgrade.effectIncrement * level);
+            }
+
+            // For multitap, if level 0, it's config.pointsPerTap. If level > 0, it's config.pointsPerTap + increments
+            if(upgrade.id === 'multitap') {
+                effect = this.config.pointsPerTap + (upgrade.effectIncrement * level);
+            }
+            if(upgrade.id === 'energyRecharge') {
+                effect = this.config.energyRechargeRate + (upgrade.effectIncrement * level);
+            }
+
+            return effect;
+        },
+
+        buyUpgrade: function(upgradeId) {
+            const upgrade = this.state.availableUpgrades.find(u => u.id === upgradeId);
+            if (!upgrade) {
+                this.showToast("Upgrade not found!", "error");
+                return;
+            }
+
+            const cost = this.getUpgradeCost(upgrade);
+            const currentLevel = this.state.upgrades[upgradeId] || 0;
+
+            if (currentLevel >= upgrade.maxLevel) {
+                this.showToast("Max level reached for this upgrade!", "info");
+                return;
+            }
+
+            if (this.state.points >= cost) {
+                this.state.points -= cost;
+                this.state.upgrades[upgradeId]++;
+                
+                this.updateDerivedStats(); // Recalculate stats like tapPower, maxEnergy
+                this.updateAllUI(); // Update points, PPH, upgrade list, etc.
+                this.renderUpgradesPage(); // Re-render to show new level and cost
+                
+                this.showToast(`${upgrade.name} upgraded to Level ${this.state.upgrades[upgradeId]}!`, "success");
+                if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('success');
+                }
+                this.saveGameState();
+            } else {
+                this.showToast("Not enough points!", "error");
+                 if (this.state.settings.hapticsEnabled && window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.HapticFeedback.notificationOccurred('error');
+                }
+            }
+        },
+        
+        updateDerivedStats: function() {
+            this.state.tapPower = this.getUpgradeEffect('multitap', this.config.pointsPerTap);
+            this.state.maxEnergy = this.getUpgradeEffect('energyLimit', this.config.defaultEnergy);
+            // Ensure currentEnergy doesn't exceed new maxEnergy
+            this.state.currentEnergy = Math.min(this.state.currentEnergy, this.state.maxEnergy);
+            
+            this.calculateProfitPerHour(); // Recalculates and sets this.state.profitPerHour
+            // Update player level (example logic)
+            this.updatePlayerLevel();
+        },
+        
+        updatePlayerLevel: function() {
+            // Example: Level up based on total points or PPH
+            // This is a simple placeholder logic
+            const pph = this.state.profitPerHour;
+            if (pph >= 10000) this.state.level = 5;
+            else if (pph >= 5000) this.state.level = 4;
+            else if (pph >= 1000) this.state.level = 3;
+            else if (pph >= 100) this.state.level = 2;
+            else this.state.level = 1;
+        },
+
+        // --- Tasks Logic ---
+        completeTask: function(taskId) {
+            const task = this.findTaskById(taskId);
+            if (!task || this.state.tasksCompleted[taskId]) return;
+
+            // For external tasks, we might just mark complete and give reward
+            // For game_event tasks, they should be marked by the event itself
+            if (task.type === 'external' || task.type === 'daily' || (task.type === 'daily_counter' && task.checkCompletion())) {
+                this.state.points += task.reward;
+                this.state.tasksCompleted[taskId] = true; // Mark as completed
+                if (task.type === 'daily') this.markDailyTaskCompleted(taskId);
+
+                this.updatePointsDisplay();
+                this.renderTasksPage(); // Re-render tasks
+                this.showToast(`Task "${task.name}" completed! +${this.formatNumber(task.reward)} points.`, "success");
+                this.saveGameState();
+            } else if (task.link) {
+                 if (window.Telegram && window.Telegram.WebApp) {
+                    window.Telegram.WebApp.openLink(task.link);
+                 } else {
+                    window.open(task.link, '_blank');
+                 }
+                 // For external link tasks, user needs to come back and claim, or we use a delay
+                 // For simplicity, let's assume some tasks auto-verify after a short delay (mocked)
+                 // Or, add a "Check" button. For now, we'll assume they are trusted to complete.
+                 // Consider adding a "Claim" button after they click "Join/Follow"
+            }
+        },
+
+        findTaskById: function(taskId) {
+            for (const category of this.state.availableTasks) {
+                const task = category.tasks.find(t => t.id === taskId);
+                if (task) return task;
+            }
+            return null;
+        },
+
+        isDailyTaskCompleted: function(taskId) {
+            const today = new Date().toISOString().split('T')[0];
+            return this.state.tasksCompleted[`${taskId}_${today}`] === true;
+        },
+
+        markDailyTaskCompleted: function(taskId) {
+            const today = new Date().toISOString().split('T')[0];
+            this.state.tasksCompleted[`${taskId}_${today}`] = true;
+        },
+
+        getDailyCounter: function(counterKey) {
+            const today = new Date().toISOString().split('T')[0];
+            return this.state.tasksCompleted[`${counterKey}_${today}_count`] || 0;
+        },
+
+        incrementDailyCounter: function(counterKey, amount = 1) {
+            const today = new Date().toISOString().split('T')[0];
+            const key = `${counterKey}_${today}_count`;
+            this.state.tasksCompleted[key] = (this.state.tasksCompleted[key] || 0) + amount;
+            // Check if any tasks are completed by this increment
+            this.checkCounterTaskCompletions(counterKey);
+            this.saveGameState(); // Save frequently for counters
+        },
+        
+        checkCounterTaskCompletions: function(counterKey) {
+            this.state.availableTasks.forEach(category => {
+                category.tasks.forEach(task => {
+                    if (task.type === 'daily_counter' && task.counterKey === counterKey && !this.isTaskActuallyCompleted(task.id)) {
+                        if (task.checkCompletion && task.checkCompletion()) {
+                           // This task is now complete, but don't auto-claim here. UI should reflect it.
+                           // Re-render tasks page to show updatable claim button.
+                           if (this.state.currentPage === 'page-task') {
+                               this.renderTasksPage();
+                           }
+                        }
+                    }
+                });
+            });
+        },
+
+        isTaskActuallyCompleted: function(taskId) {
+            // This checks the general completion, not daily instance
+            const task = this.findTaskById(taskId);
+            if (!task) return false;
+
+            if (task.type === 'daily' || task.type === 'daily_counter') {
+                return this.isDailyTaskCompleted(taskId);
+            }
+            return this.state.tasksCompleted[taskId] === true;
+        },
+        
+        // --- Boosts Logic ---
+        checkDailyBoostReset: function() {
+            const today = new Date().toISOString().split('T')[0];
+            const lastResetDate = this.state.fullEnergyBoostsLastReset ? new Date(this.state.fullEnergyBoostsLastReset).toISOString().split('T')[0] : null;
+
+            if (today !== lastResetDate) {
+                this.state.fullEnergyBoostsUsedToday = 0;
+                this.state.fullEnergyBoostsLastReset = new Date().getTime();
+                // Reset other daily boosts usage counts here
+                if(this.state.activeBoosts && this.state.activeBoosts.turboTap) {
+                    this.state.activeBoosts.turboTap.usedToday = false;
+                }
+                this.log("Daily boosts reset.");
+                this.updateFullEnergyBoostButton(); // Update UI for full energy on tap page
+                if(this.state.currentPage === 'page-boosts') this.renderBoostsPage();
+                this.saveGameState();
+            }
+        },
+        
+        activateTurboTapBoost: function() {
+            if (!this.state.activeBoosts) this.state.activeBoosts = {};
+            if (!this.state.activeBoosts.turboTap) this.state.activeBoosts.turboTap = { active: false, endTime: 0, usedToday: false, originalTapPower: 0 };
+
+            const boostState = this.state.activeBoosts.turboTap;
+            const boostDef = this.state.availableBoosts.find(b => b.id === 'turboTap');
+
+            if (boostState.active) {
+                this.showToast("Turbo Tap is already active!", "info");
+                return;
+            }
+            if (boostState.usedToday && boostDef.usesPerDay <= (this.state.activeBoosts.turboTap.usesCountToday || 0) ) {
+                 this.showToast("Turbo Tap already used today.", "info");
+                 return;
+            }
+
+            boostState.originalTapPower = this.state.tapPower;
+            this.state.tapPower *= 3; // Triple tap power
+            boostState.active = true;
+            boostState.endTime = Date.now() + boostDef.duration;
+            boostState.usedToday = true; // Mark as used for the day
+            boostState.usesCountToday = (boostState.usesCountToday || 0) + 1;
+
+
+            this.showToast("Turbo Tap Activated! Tap power x3 for 30s.", "success", 3000);
+            this.updateTapPowerDisplay(); // if there's a specific display for tap power on profile/tap page
+            this.renderBoostsPage(); // Re-render boosts to show active state / timer
+
+            // Timer to deactivate
+            setTimeout(() => {
+                this.state.tapPower = boostState.originalTapPower;
+                boostState.active = false;
+                this.showToast("Turbo Tap ended.", "info");
+                this.updateTapPowerDisplay();
+                this.renderBoostsPage();
+                this.saveGameState();
+            }, boostDef.duration);
+            this.saveGameState();
+        },
+
+
+        // --- Daily Reward Logic ---
+        checkDailyReward: function() {
+            const now = new Date();
+            const today = now.toISOString().split('T')[0];
+            const lastClaimDate = this.state.dailyRewardClaimedTime ? new Date(this.state.dailyRewardClaimedTime).toISOString().split('T')[0] : null;
+
+            if (today !== lastClaimDate) {
+                this.elements.dailyRewardAmount.textContent = this.formatNumber(this.config.dailyRewardBase);
+                this.elements.claimDailyRewardBtn.disabled = false;
+                this.elements.dailyRewardModal.classList.add('show');
+            } else {
+                // Optional: Show message if already claimed
+                // this.elements.dailyRewardMessage.textContent = "You've already claimed your daily reward. Come back tomorrow!";
+                // this.elements.claimDailyRewardBtn.disabled = true;
+                // this.elements.dailyRewardModal.classList.add('show'); // Or just don't show it
+            }
+        },
+
+        claimDailyReward: function() {
+            this.state.points += this.config.dailyRewardBase;
+            this.state.dailyRewardClaimedTime = Date.now();
+            this.updatePointsDisplay();
+            this.elements.dailyRewardMessage.textContent = `Awesome! ${this.formatNumber(this.config.dailyRewardBase)} points added.`;
+            this.elements.claimDailyRewardBtn.textContent = "Claimed!";
+            this.elements.claimDailyRewardBtn.disabled = true;
+            this.showToast(`+${this.formatNumber(this.config.dailyRewardBase)} points from daily reward!`, "success");
+            this.saveGameState();
+            // Optional: Auto-close modal after a delay
+            setTimeout(() => this.elements.dailyRewardModal.classList.remove('show'), 2000);
+        },
+
+        // --- Frens Logic ---
+        inviteFren: function() {
+            const referralId = this.state.userProfile.id || 'testuser';
+            // Construct referral link (this depends on how your bot handles deep linking)
+            // Example: t.me/your_bot_name?start=ref_USERID
+            const botUsername = "xotswap_bot"; // Replace with your actual bot username
+            const referralLink = `https://t.me/${botUsername}?start=ref_${referralId}`;
+            
+            const text = `Join me in Xot_swap Power Play and get ${this.formatNumber(this.config.frenWelcomeBonus)} bonus points! ${referralLink}`;
+
+            if (window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.openTelegramLink) {
+                 // Share via Telegram's native share dialog
+                 window.Telegram.WebApp.openTelegramLink(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodeURIComponent(`Join me in Xot_swap Power Play and get ${this.formatNumber(this.config.frenWelcomeBonus)} bonus points!`)}`);
+            } else {
+                // Fallback for non-Telegram environments (copy to clipboard)
+                this.copyToClipboard(referralLink, "Referral link copied! Share it with your frens.");
+            }
+        },
+        
+        // Called when a new user joins via referral link (simulated for now)
+        processReferral: function(referrerId) {
+            // This would ideally be triggered by backend/bot logic when a new user joins
+            this.log(`Processing referral from ${referrerId}`);
+            // Give welcome bonus to new user
+            this.state.points += this.config.frenWelcomeBonus;
+            this.showToast(`Welcome! You received ${this.formatNumber(this.config.frenWelcomeBonus)} points from your fren!`, "success", 4000);
+            
+            // TODO: Send message to referrer (server-side or via bot API) that their fren joined
+            // For client-side demo, we can't directly add to another user's frens list or give them points.
+            // This part would need server interaction.
+            this.saveGameState();
+        },
+        
+        // Simulate adding a fren for demo purposes
+        addSimulatedFren: function() {
+            const newFrenId = `fren_${Date.now()}`;
+            const newFren = {
+                id: newFrenId,
+                name: `Fren ${this.state.frens.length + 1}`,
+                photoUrl: null, // Placeholder
+                pointsEarnedForMe: 0, // Future use
+                joinDate: new Date().toISOString()
+            };
+            this.state.frens.push(newFren);
+            
+            // Give bonus to current user for inviting
+            this.state.points += this.config.frenInviteBonus;
+            this.showToast(`Your fren ${newFren.name} joined! +${this.formatNumber(this.config.frenInviteBonus)} points.`, "success");
+            
+            this.updatePointsDisplay();
+            this.renderFrensPage();
+            this.saveGameState();
+            this.markTaskAsCompletedByEvent('frenInvited');
+        },
+        
+        markTaskAsCompletedByEvent: function(eventKey) {
+            this.state.availableTasks.forEach(category => {
+                category.tasks.forEach(task => {
+                    if (task.type === 'game_event' && task.eventKey === eventKey && !this.isTaskActuallyCompleted(task.id)) {
+                        this.completeTask(task.id); // This will handle reward and marking complete
+                    }
+                });
+            });
+        },
+
+
+        // --- Withdraw Logic (Conceptual) ---
+        handleWithdrawRequest: function() {
+            const amount = parseInt(this.elements.withdrawAmountInput.value);
+            const method = this.elements.withdrawMethodSelect.value;
+            const address = this.elements.withdrawAddressInput.value;
+
+            this.elements.withdrawMessage.textContent = "";
+            this.elements.withdrawMessage.className = "mt-2";
+
+
+            if (isNaN(amount) || amount <= 0) {
+                this.setWithdrawMessage("Please enter a valid amount.", "error");
+                return;
+            }
+            if (amount > this.state.points) {
+                this.setWithdrawMessage("Insufficient points for withdrawal.", "error");
+                return;
+            }
+            if (method === "ton_usdt" && !address) {
+                 this.setWithdrawMessage("Please enter your TON wallet address.", "error");
+                return;
+            }
+            // Basic TON address validation (very simple, improve for production)
+            if (method === "ton_usdt" && (address.length < 40 || !address.startsWith("UQ") && !address.startsWith("EQ"))) {
+                this.setWithdrawMessage("Invalid TON wallet address format.", "error");
+                return;
+            }
+
+            // Simulate request
+            this.showLoadingOverlay();
+            this.setWithdrawMessage("Processing your withdrawal request...", "info");
+
+            setTimeout(() => {
+                this.hideLoadingOverlay();
+                // This is where you'd interact with a backend API
+                // For now, simulate success or failure
+                const success = Math.random() > 0.1; // 90% success rate for demo
+
+                if (success) {
+                    this.state.points -= amount;
+                    this.updatePointsDisplay();
+                    this.updateProfilePage(); // Update points on profile page too
+                    this.setWithdrawMessage(`Withdrawal request for ${this.formatNumber(amount)} points submitted successfully! It will be processed soon.`, "success");
+                    // Add to mock history
+                    const historyEntry = {
+                        id: `wd_${Date.now()}`,
+                        amount: amount,
+                        method: method,
+                        address: address,
+                        status: 'Pending', // Or 'Processing'
+                        date: new Date().toISOString()
+                    };
+                    // Prepend to history
+                    if (!this.state.withdrawHistory) this.state.withdrawHistory = [];
+                    this.state.withdrawHistory.unshift(historyEntry);
+                    this.renderWithdrawHistory();
+                    this.elements.withdrawAmountInput.value = "";
+                    this.elements.withdrawAddressInput.value = "";
+                    this.saveGameState();
+                } else {
+                    this.setWithdrawMessage("Withdrawal request failed. Please try again later or contact support.", "error");
+                }
+            }, 2000); // Simulate network delay
+        },
+        
+        setWithdrawMessage: function(message, type) {
+            this.elements.withdrawMessage.textContent = message;
+            this.elements.withdrawMessage.className = `mt-2 ${type}`; // type is 'success', 'error', or 'info'
+        },
+
+
+        // --- UI Rendering and Updates ---
+        updateAllUI: function() {
+            this.log("Updating all UI components...");
+            this.updatePointsDisplay();
+            this.updateEnergyDisplay();
+            this.updatePPHDisplay();
+            this.updateLevelDisplay();
+            this.updateProfilePage();
+            this.updateTapPowerDisplay(); // For profile page
+            this.updateMaxEnergyDisplay(); // For profile page
+            this.updateFullEnergyBoostButton();
+            
+            // Potentially re-render dynamic lists if needed, or rely on specific page renders
+            if (this.elements[this.state.currentPage]) {
+                 switch(this.state.currentPage) {
+                    case 'page-upgrades': this.renderUpgradesPage(); break;
+                    case 'page-task': this.renderTasksPage(); break;
+                    case 'page-frens': this.renderFrensPage(); break;
+                    case 'page-boosts': this.renderBoostsPage(); break;
+                    // Tap and Profile are updated by individual functions above
+                 }
+            }
+            this.log("All UI components updated.");
+        },
+
+        updatePointsDisplay: function() {
+            if (this.elements.pointsDisplay) {
+                this.elements.pointsDisplay.textContent = this.formatNumber(this.state.points);
+            }
+            if (this.elements.profilePoints) { // Also update on profile page if visible
+                this.elements.profilePoints.textContent = this.formatNumber(this.state.points);
+            }
+        },
+
+        updateEnergyDisplay: function() {
+            if (this.elements.energyText && this.elements.energyBarFill) {
+                this.elements.energyText.textContent = `${this.formatNumber(Math.floor(this.state.currentEnergy))}/${this.formatNumber(this.state.maxEnergy)}`;
+                const energyPercentage = (this.state.currentEnergy / this.state.maxEnergy) * 100;
+                this.elements.energyBarFill.style.width = `${Math.max(0, Math.min(100, energyPercentage))}%`;
+            }
+        },
+
+        updatePPHDisplay: function() {
+            const pph = this.state.profitPerHour;
+            if (this.elements.profitPerHourDisplay) {
+                this.elements.profitPerHourDisplay.textContent = `PPH: ${this.formatNumber(pph)}`;
+            }
+            if (this.elements.profilePph) {
+                this.elements.profilePph.textContent = this.formatNumber(pph);
+            }
+        },
+        
+        updateLevelDisplay: function() {
+            if (this.elements.levelDisplay) {
+                this.elements.levelDisplay.textContent = `Level: ${this.state.level}`;
+            }
+        },
+
+        updateTapPowerDisplay: function() {
+            if (this.elements.profileTapPower) {
+                this.elements.profileTapPower.textContent = this.formatNumber(this.state.tapPower);
+            }
+        },
+        updateMaxEnergyDisplay: function() {
+            if (this.elements.profileMaxEnergy) {
+                this.elements.profileMaxEnergy.textContent = this.formatNumber(this.state.maxEnergy);
+            }
+        },
+        updateFullEnergyBoostButton: function() {
+            if (this.elements.boostFullEnergyBtn && this.elements.fullEnergyBoostsLeftDisplay) {
+                const boostsLeft = this.config.fullEnergyBoostsDaily - this.state.fullEnergyBoostsUsedToday;
+                this.elements.fullEnergyBoostsLeftDisplay.textContent = boostsLeft;
+                this.elements.boostFullEnergyBtn.disabled = boostsLeft <= 0;
+            }
+        },
+
+        renderProfilePage: function() {
+            this.log("Rendering Profile Page...");
+            if (this.elements.profileNameGreeting) {
+                this.elements.profileNameGreeting.textContent = `Welcome, ${this.state.userProfile.firstName || 'Player'}!`;
+            }
+            if (this.elements.profileUserId) {
+                this.elements.profileUserId.textContent = this.state.userProfile.id || 'N/A';
+            }
+            if (this.elements.profileJoinDate) {
+                this.elements.profileJoinDate.textContent = this.state.userProfile.joinDate ? new Date(this.state.userProfile.joinDate).toLocaleDateString() : 'N/A';
+            }
+            if (this.elements.profileAvatar) {
+                if (this.state.userProfile.photoUrl) {
+                    this.elements.profileAvatar.innerHTML = `<img src="${this.state.userProfile.photoUrl}" alt="User Avatar" style="width:100%; height:100%; border-radius:50%; object-fit:cover;">`;
+                } else {
+                    this.elements.profileAvatar.textContent = (this.state.userProfile.firstName ? this.state.userProfile.firstName.charAt(0) : 'P').toUpperCase();
+                }
+            }
+            
+            if (this.elements.frenInviteBonusDisplay) this.elements.frenInviteBonusDisplay.textContent = this.formatNumber(this.config.frenInviteBonus);
+            if (this.elements.frenWelcomeBonusDisplay) this.elements.frenWelcomeBonusDisplay.textContent = this.formatNumber(this.config.frenWelcomeBonus);
+            
+            this.updatePointsDisplay();
+            this.updatePPHDisplay();
+            this.updateTapPowerDisplay();
+            this.updateMaxEnergyDisplay();
+        },
+
+        renderUpgradesPage: function() {
+            this.log("Rendering Upgrades Page...");
+            if (!this.elements.upgradesListContainer) return;
+            this.elements.upgradesListContainer.innerHTML = ''; // Clear existing
+            
+            const categories = {};
+            this.state.availableUpgrades.forEach(upg => {
+                if(!categories[upg.category]) categories[upg.category] = [];
+                categories[upg.category].push(upg);
+            });
+
+            for (const categoryName in categories) {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'upgrade-category card'; // Each category in its own card
+                
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'card-header';
+                categoryHeader.innerHTML = `<h3>${categoryName} Upgrades</h3>`;
+                categoryDiv.appendChild(categoryHeader);
+
+                const upgradeList = document.createElement('div'); // No ul, just divs for items
+                
+                categories[categoryName].forEach(upgrade => {
+                    const currentLevel = this.state.upgrades[upgrade.id] || 0;
+                    const cost = this.getUpgradeCost(upgrade);
+                    const effect = this.getUpgradeEffect(upgrade.id);
+                    const isMaxLevel = currentLevel >= upgrade.maxLevel;
+
+                    let effectText = '';
+                    if (upgrade.id === 'multitap') effectText = `+${this.formatNumber(effect)} per tap`;
+                    else if (upgrade.id === 'energyLimit') effectText = `Max ${this.formatNumber(effect)} energy`;
+                    else if (upgrade.id === 'energyRecharge') effectText = `+${this.formatNumber(effect)}/sec recharge`;
+                    else if (upgrade.id === 'profitPerHourPassive') effectText = `+${this.formatNumber(effect)} PPH`;
+                    else if (upgrade.id === 'offlineBonus') effectText = `${(effect * 100).toFixed(0)}% offline rate`;
+                    else effectText = `Value: ${this.formatNumber(effect)}`;
+
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'list-item upgrade-item';
+                    itemDiv.innerHTML = `
+                        <div class="list-item-icon">${upgrade.icon || '⚙️'}</div>
+                        <div class="item-info">
+                            <div class="item-name">${upgrade.name}</div>
+                            <div class="item-description">${upgrade.description}</div>
+                            <div class="current-effect">${effectText}</div>
+                        </div>
+                        <div class="item-action">
+                            <span class="level">Level: ${currentLevel}/${upgrade.maxLevel}</span>
+                            ${!isMaxLevel ? `<span class="cost">Cost: ${this.formatNumber(cost)} <span class="points-char">💰</span></span>` : ''}
+                            <button class="primary-btn buy-upgrade-btn" data-upgrade-id="${upgrade.id}" ${isMaxLevel || this.state.points < cost ? 'disabled' : ''}>
+                                ${isMaxLevel ? 'Max Level' : 'Upgrade'}
+                            </button>
+                        </div>
+                    `;
+                    upgradeList.appendChild(itemDiv);
+                });
+                categoryDiv.appendChild(upgradeList);
+                this.elements.upgradesListContainer.appendChild(categoryDiv);
+            }
+
+            // Add event listeners for new buttons
+            this.elements.upgradesListContainer.querySelectorAll('.buy-upgrade-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => this.buyUpgrade(e.currentTarget.dataset.upgradeId));
+            });
+        },
+
+        renderTasksPage: function() {
+            this.log("Rendering Tasks Page...");
+            if (!this.elements.taskCategoriesContainer) return;
+            this.elements.taskCategoriesContainer.innerHTML = ''; // Clear existing
+
+            this.state.availableTasks.forEach(categoryData => {
+                const categoryCard = document.createElement('div');
+                categoryCard.className = 'card task-category';
+
+                const categoryHeader = document.createElement('div');
+                categoryHeader.className = 'card-header';
+                categoryHeader.innerHTML = `<h3>${categoryData.category}</h3>`;
+                categoryCard.appendChild(categoryHeader);
+
+                const taskListUl = document.createElement('ul');
+                taskListUl.className = 'task-list list-unstyled'; // list-unstyled from Bootstrap like styling
+
+                if (categoryData.tasks.length === 0) {
+                    taskListUl.innerHTML = `<li class="text-hint text-center p-2">No tasks available in this category.</li>`;
+                } else {
+                    categoryData.tasks.forEach(task => {
+                        const isCompleted = this.isTaskActuallyCompleted(task.id);
+                        let canClaim = false;
+                        let progressText = '';
+
+                        if (task.type === 'daily_counter' && !isCompleted) {
+                            const currentCount = this.getDailyCounter(task.counterKey);
+                            progressText = `(${currentCount}/${task.target})`;
+                            if (task.checkCompletion && task.checkCompletion()) {
+                                canClaim = true;
+                            }
+                        } else if (task.type === 'game_milestone' && !isCompleted) {
+                             if (task.checkCompletion && task.checkCompletion()) {
+                                canClaim = true;
+                            }
+                        } else if (task.type === 'external' && !isCompleted) {
+                            canClaim = true; // External tasks are often manually claimable after action
+                        } else if (task.type === 'daily' && !isCompleted) {
+                            canClaim = true;
+                        }
+
+
+                        const taskItem = document.createElement('li');
+                        taskItem.className = `list-item task-item ${isCompleted ? 'completed' : ''}`;
+                        taskItem.innerHTML = `
+                            <div class="list-item-icon">${task.icon || '✔️'}</div>
+                            <div class="item-info">
+                                <div class="item-name">${task.name} ${progressText}</div>
+                                <div class="item-description">${task.description}</div>
+                                <div class="item-reward">Reward: ${this.formatNumber(task.reward)} <span class="points-char">💰</span></div>
+                            </div>
+                            <div class="item-action task-action">
+                                <button class="primary-btn complete-task-btn" data-task-id="${task.id}" ${isCompleted ? 'disabled' : (!canClaim && (task.type !== 'external' && task.type !== 'game_event') ? 'disabled' : '')}>
+                                    ${isCompleted ? 'Claimed' : ( (task.type === 'daily_counter' || task.type === 'game_milestone') && !canClaim ? task.actionText : (task.link ? 'Go' : 'Claim'))}
+                                </button>
+                            </div>
+                        `;
+                        taskListUl.appendChild(taskItem);
+                    });
+                }
+                categoryCard.appendChild(taskListUl);
+                this.elements.taskCategoriesContainer.appendChild(categoryCard);
+            });
+
+            // Add event listeners for new buttons
+            this.elements.taskCategoriesContainer.querySelectorAll('.complete-task-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const taskId = e.currentTarget.dataset.taskId;
+                    const task = this.findTaskById(taskId);
+                    if (task && task.link && !this.isTaskActuallyCompleted(taskId)) { // If it has a link and not completed, it's likely an external action first
+                        if (window.Telegram && window.Telegram.WebApp) {
+                            window.Telegram.WebApp.openLink(task.link);
+                        } else {
+                            window.open(task.link, '_blank');
+                        }
+                        // Optionally, change button to "Verify" or "Claim" after clicking link
+                        // For now, we assume they need to click again to claim if it's that type.
+                        // Or, for simplicity, some tasks might auto-claim after a delay (not implemented here)
+                        // If the task is of type 'external', the button text might already be 'Claim' and we allow them to click it.
+                        if(task.type !== 'external') { // External tasks might require a second click to "Claim"
+                           e.currentTarget.textContent = 'Check'; // Example: change button to "Check"
+                           // Then the next click would call completeTask
+                        } else {
+                            this.completeTask(taskId); // Direct claim for simple external/daily
+                        }
+
+                    } else {
+                        this.completeTask(taskId);
+                    }
+                });
+            });
+        },
+        
+        renderFrensPage: function() {
+            this.log("Rendering Frens Page...");
+            if (!this.elements.frensList) return;
+            this.elements.frensList.innerHTML = ''; // Clear list
+
+            if (this.elements.frensCountDisplay) {
+                 this.elements.frensCountDisplay.textContent = this.state.frens.length;
+            }
+            if (this.elements.frenInviteBonusDisplay) this.elements.frenInviteBonusDisplay.textContent = this.formatNumber(this.config.frenInviteBonus);
+            if (this.elements.frenWelcomeBonusDisplay) this.elements.frenWelcomeBonusDisplay.textContent = this.formatNumber(this.config.frenWelcomeBonus);
+
+
+            if (this.state.frens.length === 0) {
+                this.elements.noFrensMessage.classList.remove('hidden');
+                return;
+            }
+            this.elements.noFrensMessage.classList.add('hidden');
+
+            this.state.frens.forEach(fren => {
+                const frenItem = document.createElement('li');
+                frenItem.className = 'list-item fren-item';
+                // Placeholder for fren avatar
+                const avatarInitial = fren.name ? fren.name.charAt(0).toUpperCase() : 'F';
+                frenItem.innerHTML = `
+                    <div class="list-item-icon fren-avatar" style="${fren.photoUrl ? `background-image:url(${fren.photoUrl})` : ''}">${fren.photoUrl ? '' : avatarInitial}</div>
+                    <div class="item-info">
+                        <div class="item-name fren-name">${fren.name || 'Anonymous Fren'}</div>
+                        <div class="item-description">Joined: ${new Date(fren.joinDate).toLocaleDateString()}</div>
+                    </div>
+                    <div class="item-action">
+                        <span class="fren-bonus">+${this.formatNumber(fren.pointsEarnedForMe || 0)}</span>
+                    </div>
+                `;
+                this.elements.frensList.appendChild(frenItem);
+            });
+            //Temp: Add simulate fren button if list is empty for testing
+            if (this.state.frens.length === 0 && this.config.debugMode) {
+                const simButton = document.createElement('button');
+                simButton.textContent = "Add Simulated Fren (Debug)";
+                simButton.className = "primary-btn mt-2";
+                simButton.onclick = () => this.addSimulatedFren();
+                this.elements.frensList.parentNode.appendChild(simButton);
+            }
+        },
+        
+        renderBoostsPage: function() {
+            this.log("Rendering Boosts Page...");
+            if (!this.elements.boostsListContainer) return;
+            this.elements.boostsListContainer.innerHTML = ''; // Clear existing
+
+            this.state.availableBoosts.forEach(boost => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'list-item boost-item';
+                
+                let usesLeft = Infinity;
+                let buttonText = 'Activate';
+                letisDisabled = false;
+                let timerText = '';
+
+                if (boost.type === 'daily_limited' || boost.type === 'daily_timed') {
+                    usesLeft = boost.getUsesLeft ? boost.getUsesLeft() : (boost.usesPerDay - (this.state.activeBoosts && this.state.activeBoosts[boost.id] && this.state.activeBoosts[boost.id].usesCountToday || 0));
+                    buttonText = boost.buttonText ? boost.buttonText(usesLeft) : (usesLeft > 0 ? `Activate (${usesLeft})` : 'Used Today');
+                    if (usesLeft <= 0) isDisabled = true;
+                }
+                
+                if (boost.type === 'daily_timed' && this.state.activeBoosts && this.state.activeBoosts[boost.id] && this.state.activeBoosts[boost.id].active) {
+                    const timeLeft = Math.max(0, Math.round((this.state.activeBoosts[boost.id].endTime - Date.now()) / 1000));
+                    timerText = `<div class="boost-timer">Active: ${timeLeft}s left</div>`;
+                    buttonText = 'Active';
+                    isDisabled = true; // Cannot activate if already active
+                    itemDiv.classList.add('active');
                 }
 
-                this.loadData();
-                this.initNavigation();
-                this.updateAllDisplays();
-                this.renderTasks();
-                this.renderProfile();
-                this.renderWithdrawHistory();
 
-                document.getElementById('tap-button').addEventListener('click', (event) => this.handleTap(event));
-                document.getElementById('withdraw-btn').addEventListener('click', () => this.handleWithdraw());
-                
-                setInterval(() => this.regenerateEnergy(), 1000); // Regenerate energy every second
+                itemDiv.innerHTML = `
+                    <div class="list-item-icon">${boost.icon || '🔥'}</div>
+                    <div class="item-info">
+                        <div class="item-name">${boost.name}</div>
+                        <div class="item-description">${boost.description}</div>
+                        ${timerText}
+                        ${boost.cost > 0 ? `<div class="item-reward">Cost: ${this.formatNumber(boost.cost)} <span class="points-char">💰</span></div>` : ''}
+                    </div>
+                    <div class="item-action">
+                        <button class="primary-btn activate-boost-btn" data-boost-id="${boost.id}" ${isDisabled || (boost.cost > 0 && this.state.points < boost.cost) ? 'disabled' : ''}>
+                            ${buttonText}
+                        </button>
+                    </div>
+                `;
+                this.elements.boostsListContainer.appendChild(itemDiv);
+            });
+            
+            // Add event listeners
+             this.elements.boostsListContainer.querySelectorAll('.activate-boost-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const boostId = e.currentTarget.dataset.boostId;
+                    const boost = this.state.availableBoosts.find(b => b.id === boostId);
+                    if (boost && boost.action) {
+                        if (boost.cost > 0 && this.state.points < boost.cost) {
+                            this.showToast("Not enough points for this boost!", "error");
+                            return;
+                        }
+                        if (boost.cost > 0) this.state.points -= boost.cost; this.updatePointsDisplay();
+                        boost.action();
+                    } else {
+                        this.showToast("Boost action not defined.", "error");
+                    }
+                });
+            });
+        },
+        
+        renderWithdrawHistory: function() {
+            if (!this.elements.withdrawHistoryList) return;
+            this.elements.withdrawHistoryList.innerHTML = ''; // Clear
+            const history = this.state.withdrawHistory || [];
 
-                // Set initial active page (Tap page)
-                this.showPage('page-tap'); 
-                document.querySelector(`.nav-btn[data-page="page-tap"]`).classList.add('active');
-            },
+            if (history.length === 0) {
+                this.elements.noWithdrawHistoryMessage.classList.remove('hidden');
+                return;
+            }
+            this.elements.noWithdrawHistoryMessage.classList.add('hidden');
 
-            loadData: function() {
-                const savedData = localStorage.getItem(this.config.localStorageKey);
-                if (savedData) {
-                    const parsedData = JSON.parse(savedData);
-                    // Carefully merge, prioritize existing tasks structure if IDs match
-                    // to preserve task definitions, but update completion status
-                    const currentTaskIds = this.userData.tasks.map(t => t.id);
-                    const savedTasks = parsedData.tasks || [];
-                    
-                    this.userData = {
-                        ...this.userData, // Start with defaults (e.g. new tasks are added)
-                        ...parsedData,    // Override with saved data
-                        tasks: this.userData.tasks.map(defaultTask => { // Merge tasks
-                            const savedTask = savedTasks.find(st => st.id === defaultTask.id);
-                            return savedTask ? { ...defaultTask, completed: savedTask.completed } : defaultTask;
-                        })
-                    };
-                    // Ensure essential values are numbers
-                    this.userData.points = Number(this.userData.points) || 0;
-                    this.userData.energy = Number(this.userData.energy) || 0;
-                    this.user
+            history.forEach(item => {
+                const li = document.createElement('li');
+                li.className = 'history-item';
+                li.innerHTML = `
+                    <div>
+                        <span class="amount">${this.formatNumber(item.amount)} Points</span> to ${item.method.replace('_', ' ').toUpperCase()}
+                        <br><small class="text-hint">Date: ${new Date(item.date).toLocaleString()}</small>
+                    </div>
+                    <div class="status ${item.status.toLowerCase()}">${item.status}</div>
+                `;
+                this.elements.withdrawHistoryList.appendChild(li);
+            });
+        },
+
+        // --- Navigation ---
+        navigateToPage: function(pageId, isInitialLoad = false) {
+            this.log(`Navigating to page: ${pageId}`);
+            if (!this.elements[pageId]) {
+                this.error(`Page ${pageId} not found in cached elements.`);
+                // Fallback to tap page if requested page doesn't exist
+                if (pageId !== 'page-tap') this.navigateToPage('page-tap');
+                return;
+            }
+            
+            const oldPage = document.querySelector('.page.active');
+            if (oldPage && !isInitialLoad) {
+                oldPage.classList.add('exiting');
+                // Remove 'active' after animation
+                setTimeout(() => {
+                    oldPage.classList.remove('active');
+                    oldPage.classList.remove('exiting');
+                }, 300); // Match animation duration
+            } else if (oldPage) {
+                 oldPage.classList.remove('active');
+            }
+
+
+            const newPage = this.elements[pageId];
+            // Delay adding active class for new page to allow old page to animate out
+            setTimeout(() => {
+                newPage.classList.add('active');
+            }, isInitialLoad ? 0 : 50); // Shorter delay or no delay for initial load
+
+            this.state.currentPage = pageId;
+
+            // Update nav button active states
+            this.elements.navButtons.forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.page === pageId);
+            });
+
+            // Specific page rendering/update logic
+            switch(pageId) {
+                case 'page-profile': this.renderProfilePage(); break;
+                case 'page-upgrades': this.renderUpgradesPage(); break;
+                case 'page-task': this.renderTasksPage(); break;
+                case 'page-frens': this.renderFrensPage(); break;
+                case 'page-boosts': this.renderBoostsPage(); break;
+                case 'page-withdraw': this.renderWithdrawHistory(); break;
+                // Tap page is generally always up-to-date via its specific update functions
+            }
+            
+            // Scroll to top of new page
+            if (this.elements.contentArea) this.elements.contentArea.scrollTop = 0;
+            
+            if(!isInitialLoad) this.saveGameState(); // Save current page
+        },
+
+        // --- Modals & Toasts ---
+        showToast: function(message, type = 'info', duration = 3000) {
+            if (!this.elements.toastNotification) return;
+            const toast = this.elements.toastNotification;
+            toast.textContent = message;
+            toast.className = `show ${type}`; // type can be 'success', 'error', 'info'
+
+            setTimeout(() => {
+                toast.className = toast.className.replace('show', '').trim();
+            }, duration);
+        },
+        
+        showConfirmationModal: function(title, message, onConfirm, icon = '❓') {
+            if (!this.elements.confirmationModal) return;
+            this.elements.confirmationModalTitle.textContent = title;
+            this.elements.confirmationModalMessage.innerHTML = message; // Use innerHTML to allow for formatted messages
+            this.elements.confirmationModalIcon.textContent = icon;
+            
+            // Clone and replace the confirm button to remove old listeners
+            const oldConfirmBtn = this.elements.confirmationModalConfirmBtn;
+            const newConfirmBtn = oldConfirmBtn.cloneNode(true);
+            oldConfirmBtn.parentNode.replaceChild(newConfirmBtn, oldConfirmBtn);
+            this.elements.confirmationModalConfirmBtn = newConfirmBtn; // Update cached element
+
+            this.elements.confirmationModalConfirmBtn.onclick = () => {
+                onConfirm();
+                this.hideConfirmationModal();
+            };
+            this.elements.confirmationModal.classList.add('show');
+        },
+
+        hideConfirmationModal: function() {
+            if (this.elements.confirmationModal) {
+                this.elements.confirmationModal.classList.remove('show');
+            }
+        },
+
+        showLoadingOverlay: function() {
+            if (this.elements.loadingOverlay) this.elements.loadingOverlay.classList.add('show');
+        },
+        hideLoadingOverlay: function() {
+            if (this.elements.loadingOverlay) this.elements.loadingOverlay.classList.remove('show');
+        },
+
+        // --- Data Persistence (localStorage) ---
+        saveGameState: function() {
+            try {
+                const stateToSave = {
+                    points: this.state.points,
+                    level: this.state.level,
+                    currentEnergy: this.state.currentEnergy, // Save current energy
+                    lastEnergyUpdateTime: this.state.lastEnergyUpdateTime,
+                    lastLoginTime: this.state.lastLoginTime,
+                    dailyRewardClaimedTime: this.state.dailyRewardClaimedTime,
+                    fullEnergyBoostsUsedToday: this.state.fullEnergyBoostsUsedToday,
+                    fullEnergyBoostsLastReset: this.state.fullEnergyBoostsLastReset,
+                    upgrades: this.state.upgrades,
+                    tasksCompleted: this.state.tasksCompleted,
+                    frens: this.state.frens,
+                    userProfileId: this.state.userProfile.id, // Only save ID, other profile info comes from TG
+                    userProfileJoinDate: this.state.userProfile.joinDate,
+                    settings: this.state.settings,
+                    currentPage: this.state.currentPage,
+                    activeBoosts: this.state.activeBoosts, // Save active boosts state
+                    withdrawHistory: this.state.withdrawHistory,
+                };
+                localStorage.setItem(this.config.localStoragePrefix + 'gameState', JSON.stringify(stateToSave));
+                this.log("Game state saved.");
+            } catch (e) {
+                this.error("Error saving game state:", e);
+                // Potentially notify user if storage is full or unavailable
+            }
+        },
+
+        loadGameState: function() {
+            this.log("Loading game state...");
+            try {
+                const savedState = localStorage.getItem(this.config.localStoragePrefix + 'gameState');
+                if (savedState) {
+                    const parsedState = JSON.parse(savedState);
+                    // Merge saved state with defaults, prioritizing saved values
+                    this.state.points = parsedState.points || 0;
+                    this.state.level = parsedState.level || 1;
+                    // currentEnergy and lastEnergyUpdateTime will be handled by recharge logic after load
+                    this.state.currentEnergy = parsedState.currentEnergy !== undefined ? parsedState.currentEnergy : this.config.defaultEnergy; // Start with saved or full
+                    this.state.lastEnergyUpdateTime = parsedState.lastEnergyUpdateTime || Date.now();
+                    this.state.lastLoginTime = parsedState.lastLoginTime || Date.now(); // Important for offline earnings
+                    this.state.dailyRewardClaimedTime = parsedState.dailyRewardClaimedTime || 0;
+                    this.state.fullEnergyBoostsUsedToday = parsedState.fullEnergyBoostsUsedToday || 0;
+                    this.state.fullEnergyBoostsLastReset = parsedState.fullEnergyBoostsLastReset || 0;
+                    this.state.upgrades = parsedState.upgrades || {};
+                    this.state.tasksCompleted = parsedState.tasksCompleted || {};
+                    this.state.frens = parsedState.frens || [];
+                    this.state.settings = {...this.state.settings, ...parsedState.settings};
+                    this.state.currentPage = parsedState.currentPage || 'page-tap';
+                    this.state.activeBoosts = parsedState.activeBoosts || {};
+                    this.state.withdrawHistory = parsedState.withdrawHistory || [];
+
+
+                    // User profile ID from storage if not overridden by TG
+                    if (parsedState.userProfileId && !this.state.userProfile.id) {
+                        this.state.userProfile.id = parsedState.userProfileId;
+                    }
+                     if (parsedState.userProfileJoinDate) { // Load join date if available
+                        this.state.userProfile.joinDate = parsedState.userProfileJoinDate;
+                    }
+
+                    this.log("Game state loaded:", parsedState);
+                } else {
+                    this.log("No saved game state found. Initializing with defaults.");
+                    // First time load: Set defaults based on config and initial upgrade effects
+                    this.updateDerivedStats(); // This sets tapPower, maxEnergy, PPH
+                    this.state.currentEnergy = this.state.maxEnergy; // Start with full energy on first load
+                    this.state.lastLoginTime = Date.now();
+                    this.state.userProfile.joinDate = new Date().toISOString(); // Set join date for new user
+                    this.saveGameState(); // Save initial state
+                }
+            } catch (e) {
+                this.error("Error loading game state:", e);
+                // If loading fails, reset to default state (or parts of it)
+                // this.resetGameState(); // Be careful with full reset
+            }
+             // This needs to be called AFTER state.upgrades is loaded.
+            this.updateDerivedStats(); 
+            // Ensure current energy is not more than max after loading upgrades
+            this.state.currentEnergy = Math.min(this.state.currentEnergy, this.state.maxEnergy);
+        },
+        
+        resetGameState: function(confirm = true) {
+            const doReset = () => {
+                localStorage.removeItem(this.config.localStoragePrefix + 'gameState');
+                // Re-initialize core defaults but keep user profile from TG if available
+                const tgUserProfile = {...this.state.userProfile}; // Preserve TG data
+
+                // Reset state object to nearly initial values
+                this.state.points = 0;
+                this.state.level = 1;
+                this.state.maxEnergy = this.config.defaultEnergy;
+                this.state.currentEnergy = this.config.defaultEnergy;
+                this.state.tapPower = this.config.pointsPerTap;
+                this.state.profitPerHour = 0;
+                this.state.lastEnergyUpdateTime = Date.now();
+                this.state.lastLoginTime = Date.now();
+                this.state.dailyRewardClaimedTime = 0;
+                this.state.fullEnergyBoostsUsedToday = 0;
+                this.state.fullEnergyBoostsLastReset = 0;
+                this.state.upgrades = {};
+                this.state.tasksCompleted = {};
+                this.state.frens = [];
+                this.state.activeBoosts = {};
+                this.state.withdrawHistory = [];
+                // Restore TG user profile data
+                this.state.userProfile = tgUserProfile;
+                if (!this.state.userProfile.joinDate) this.state.userProfile.joinDate = new Date().toISOString();
+
+                this.initializeGameData(); // Re-init upgrades definitions and default levels
+                this.updateAllUI();
+                this.saveGameState();
+                this.showToast("Game Reset Successfully!", "success");
+                this.log("Game state has been reset.");
+                this.navigateToPage('page-tap');
+            };
+
+            if (confirm) {
+                this.showConfirmationModal(
+                    "Reset Game?",
+                    "Are you sure you want to reset all your game progress? This action cannot be undone.",
+                    doReset,
+                    "⚠️"
+                );
+            } else {
+                doReset();
+            }
+        },
+
+
+        // --- Utilities ---
+        formatNumber: function(num) {
+            if (num === undefined || num === null) return '0';
+            if (num >= 1000000000) return (num / 1000000000).toFixed(2) + 'B';
+            if (num >= 1000000) return (num / 1000000).toFixed(2) + 'M';
+            if (num >= 10000) return (num / 1000).toFixed(1) + 'K'; // Show one decimal for 10K+
+            return Math.floor(num).toLocaleString('en-US'); // Comma separators for smaller numbers
+        },
+
+        copyToClipboard: function(text, successMessage = "Copied to clipboard!") {
+            if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text)
+                    .then(() => this.showToast(successMessage, "success"))
+                    .catch(err => this.showToast("Failed to copy.", "error"));
+            } else {
+                // Fallback for older browsers
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                textArea.style.position = "fixed"; // Prevent scrolling to bottom
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    this.showToast(successMessage, "success");
+                } catch (err) {
+                    this.showToast("Failed to copy (fallback).", "error");
+                }
+                document.body.removeChild(textArea);
+            }
+        },
+        
+        copyReferralLink: function() {
+            const referralId = this.state.userProfile.id || 'testuser';
+            const botUsername = "xotswap_bot"; // Replace with your actual bot username
+            const referralLink = `https://t.me/${botUsername}?start=ref_${referralId}`;
+            this.copyToClipboard(referralLink, "Referral link copied!");
+        },
+
+        log: function(...args) {
+            if (this.config.debugMode) {
+                console.log(`[${this.config.appName}]`, ...args);
+            }
+        },
+
+        error: function(...args) {
+            console.error(`[${this.config.appName} ERROR]`, ...args);
+            // Optionally, could send errors to a logging service if not in debug mode
+        }
+    };
+
+    // --- App Entry Point ---
+    document.addEventListener('DOMContentLoaded', () => {
+        // Show loading overlay initially, app.init() will hide it
+        const loadingOverlay = document.getElementById('loading-overlay');
+        if (loadingOverlay) loadingOverlay.classList.add('show');
+        
+        // Artificial delay for splash/loading screen feel (optional)
+        // setTimeout(() => {
+            app.init();
+        // }, 500); 
+    });
+
+    // Expose app to global scope for debugging if needed
+    if (app.config.debugMode) {
+        window.xotApp = app;
+        console.log("XotSwap App exposed as window.xotApp for debugging.");
+        console.log("Try: xotApp.state.points += 10000; xotApp.updateAllUI(); xotApp.saveGameState();");
+        console.log("Or: xotApp.resetGameState(false); to reset without confirmation (for quick testing).");
+        console.log("Or: xotApp.addSimulatedFren();");
+    }
+
+    </script>
+</body>
+</html>
+```
